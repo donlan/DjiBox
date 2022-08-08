@@ -15,4 +15,5 @@
     <dimen name="item_title_size">18sp</dimen>
     <dimen name="test_log_textsize">17sp</dimen>
     <dimen name="button_widget">200dp</dimen>
+    <dimen name="tool_bar_height">48dp</dimen>
 </resources>

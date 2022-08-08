@@ -22,6 +22,25 @@ android {
             // above, FFmpeg lib might lead to runtime crashes or warnings.
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
+
+        signingConfigs {
+            release {
+                storeFile file("../dooze.keystore")
+                storePassword "doozegogo123"
+                keyAlias "dooze"
+                keyPassword "doozegogo123"
+            }
+
+
+            debug {
+                storeFile file("../dooze.keystore")
+                storePassword "doozegogo123"
+                keyAlias "dooze"
+                keyPassword "doozegogo123"
+            }
+
+        }
+
     }
 
     buildTypes {
@@ -72,7 +91,8 @@ android {
 }
 
 dependencies {
-
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.google.android.material:material:1.6.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -91,6 +111,22 @@ dependencies {
     })
     compileOnly 'com.dji:dji-sdk-provided:4.16.1'
 
+    implementation ('com.dji:dji-uxsdk:4.14', {
+        /**
+         * Uncomment the "library-anti-distortion" if your app does not need Anti Distortion for Mavic 2 Pro and Mavic 2 Zoom.
+         * Uncomment the "fly-safe-database" if you need database for release, or we will download it when DJISDKManager.getInstance().registerApp
+         * is called.
+         * Both will greatly reduce the size of the APK.
+         */
+        exclude module: 'library-anti-distortion'
+        exclude module: 'dji-sdk'
+        exclude module: "mapbox-android-accounts"
+        exclude module: "location"
+        exclude module: "search"
+        exclude module: "3dmap"
+        //exclude module: 'fly-safe-database'
+    })
+
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.core:core:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -104,7 +140,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.21"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
-    implementation 'com.google.android.gms:play-services:12.0.1'
+    //implementation 'com.google.android.gms:play-services:12.0.1'
 
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-runtime:2.4.1'

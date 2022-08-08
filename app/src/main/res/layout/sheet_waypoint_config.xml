@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_sheet"
+    android:paddingBottom="24dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tool_bar_height"
+        android:gravity="center"
+        android:text="@string/waypoint_task_config_title"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tvAltitudeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="@string/waypoint_flight_altitude"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <EditText
+        android:id="@+id/etAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center"
+        android:inputType="numberDecimal"
+        android:minWidth="40dp"
+        android:text="@string/waypoint_default_altitude"
+        app:layout_constraintBottom_toBottomOf="@id/tvAltitudeTitle"
+        app:layout_constraintStart_toEndOf="@id/tvAltitudeTitle"
+        app:layout_constraintTop_toTopOf="@id/tvAltitudeTitle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/altitude_m"
+        app:layout_constraintBottom_toBottomOf="@id/tvAltitudeTitle"
+        app:layout_constraintStart_toEndOf="@id/etAltitude"
+        app:layout_constraintTop_toTopOf="@id/tvAltitudeTitle" />
+
+
+    <TextView
+        android:id="@+id/tvSpeedTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/waypoint_flight_speed"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAltitudeTitle" />
+
+
+    <TextView
+        android:id="@+id/tvSpeedValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvSpeedTitle"
+        app:layout_constraintStart_toEndOf="@id/tvSpeedTitle"
+        app:layout_constraintTop_toTopOf="@id/tvSpeedTitle"
+        tools:text="1m/s" />
+
+    <SeekBar
+        android:id="@+id/speedSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:max="10"
+        android:min="1"
+        android:paddingVertical="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvSpeedTitle" />
+
+    <TextView
+        android:id="@+id/tvFinishActionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/waypoint_finish_action_title"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/speedSeekBar" />
+
+
+    <RadioGroup
+        android:id="@+id/finishActionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvFinishActionTitle">
+
+
+        <RadioButton
+            android:id="@+id/tvActionNone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/waypoint_finish_no_action" />
+
+
+        <RadioButton
+            android:id="@+id/tvActionGoHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/waypoint_finish_go_home" />
+
+        <RadioButton
+            android:id="@+id/tvActionAutoLand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/waypoint_finish_auto_land" />
+
+
+        <RadioButton
+            android:id="@+id/tvActionToFirstPoint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/waypoint_finish_to_first_point" />
+
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/tvHeadingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/waypoint_heading_mode_title"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/finishActionGroup" />
+
+
+    <RadioGroup
+        android:id="@+id/headingActionGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvHeadingTitle">
+
+
+        <RadioButton
+            android:id="@+id/tvHeadingAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/waypoint_auto" />
+
+
+        <RadioButton
+            android:id="@+id/tvRemoteController"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/waypoint_remote_controller" />
+
+        <RadioButton
+            android:id="@+id/tvInterestPoint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/waypoint_toward_point_of_interest" />
+
+
+        <RadioButton
+            android:id="@+id/tvInitialDirection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/waypoint_initial_direction" />
+
+        <RadioButton
+            android:id="@+id/tvWaypointHeading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/waypoint_waypoint_heading" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tvPathModeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/waypoint_path_mode_title"
+        android:textColor="@color/textColorSecondary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headingActionGroup" />
+
+
+    <RadioGroup
+        android:id="@+id/pathModeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPathModeTitle">
+
+
+        <RadioButton
+            android:id="@+id/tvPathModeNormal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/waypoint_path_mode_normal" />
+
+
+        <RadioButton
+            android:id="@+id/tvPathModeCurved"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/waypoint_path_mode_curved" />
+
+
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/tvConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tool_bar_height"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_action_view"
+        android:gravity="center"
+        android:text="@string/confirm"
+        android:textColor="@color/textColorPrimaryLight"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pathModeGroup" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

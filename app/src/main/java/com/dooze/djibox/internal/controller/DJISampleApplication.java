@@ -3,6 +3,7 @@ package com.dooze.djibox.internal.controller;
 import android.app.Application;
 import android.content.Context;
 
+import com.dooze.djibox.extensions.VibratorKt;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
@@ -76,5 +77,11 @@ public class DJISampleApplication extends Application {
         MultiDex.install(this);
         com.secneo.sdk.Helper.install(this);
         app = this;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        VibratorKt.init(this);
     }
 }
