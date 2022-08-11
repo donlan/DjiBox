@@ -8,11 +8,13 @@
         <entry key="app/src/main/res/layout/activity_controller.xml" value="0.5765398550724637" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2801418439716312" />
         <entry key="app/src/main/res/layout/activity_map.xml" value="0.19429347826086957" />
+        <entry key="app/src/main/res/layout/activity_way_point.xml" value="0.32864583333333336" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.5760416666666667" />
         <entry key="app/src/main/res/layout/sheet_waypoint_config.xml" value="0.5765398550724637" />
         <entry key="app/src/main/res/layout/view_lidar.xml" value="0.2801418439716312" />
         <entry key="app/src/main/res/layout/view_login.xml" value="0.2801418439716312" />
         <entry key="app/src/main/res/menu/controller_more_funs.xml" value="0.34270833333333334" />
+        <entry key="app/src/main/res/menu/map_layer_menu.xml" value="0.575" />
         <entry key="app/src/main/res/menu/menu.xml" value="0.5911458333333334" />
       </map>
     </option>

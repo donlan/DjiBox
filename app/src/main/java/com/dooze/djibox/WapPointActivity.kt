@@ -1,19 +1,24 @@
 package com.dooze.djibox
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.MenuPopupWindow
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
-import com.amap.api.maps2d.AMapUtils
-import com.amap.api.maps2d.model.*
-import com.dooze.djibox.`fun`.missionoperator.util.WaypointV2Factory
+import com.amap.api.maps.AMap
+import com.amap.api.maps.AMapUtils
+import com.amap.api.maps.CameraUpdateFactory
+import com.amap.api.maps.model.*
 import com.dooze.djibox.databinding.ActivityWayPointBinding
 import com.dooze.djibox.databinding.SheetWaypointConfigBinding
 import com.dooze.djibox.extensions.makeVibrate
@@ -62,7 +67,14 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         override fun onExecutionStart() {
         }
 
-        override fun onExecutionFinish(p0: DJIError?) {
+        override fun onExecutionFinish(err: DJIError?) {
+            if (err != null) {
+                getString(
+                    R.string.waypoint_operator_error,
+                    err.errorCode.toString(),
+                    err.description
+                )
+            }
         }
 
     }
@@ -82,6 +94,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         binding.tvStart.setOnClickListener(this)
         binding.tvStop.setOnClickListener(this)
         binding.ivMyLocation.setOnClickListener(this)
+        binding.ivLayer.setOnClickListener(this)
 
 
         binding.mapView.map.setOnMapLongClickListener {
@@ -104,10 +117,10 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                 makeVibrate()
             }
         }
-        binding.mapView.map.setMyLocationStyle(MyLocationStyle().apply {
+        binding.mapView.map.myLocationStyle = MyLocationStyle().apply {
             this.showMyLocation(true)
             myLocationType(MyLocationStyle.LOCATION_TYPE_FOLLOW)
-        })
+        }
 
         AMapLocationClient.updatePrivacyShow(this, true, true)
         AMapLocationClient.updatePrivacyAgree(this, true)
@@ -181,7 +194,35 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.ivMyLocation -> {
                 locationClient?.lastKnownLocation?.let {
+                    binding.mapView.map.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(
+                                it.latitude,
+                                it.longitude
+                            ), 17f
+                        )
+                    )
                 }
+            }
+            R.id.ivLayer -> {
+                PopupMenu(this, v, Gravity.TOP).apply {
+                    this.menuInflater.inflate(R.menu.map_layer_menu, menu)
+                    setOnMenuItemClickListener { menu ->
+                        val type = when (menu.itemId) {
+                            R.id.mayLayerNavi -> {
+                                AMap.MAP_TYPE_NAVI
+                            }
+                            R.id.mayLayerSatellite -> {
+                                AMap.MAP_TYPE_SATELLITE
+                            }
+                            else -> {
+                                AMap.MAP_TYPE_NORMAL
+                            }
+                        }
+                        binding.mapView.map.mapType = type
+                        true
+                    }
+                }.show()
             }
         }
     }

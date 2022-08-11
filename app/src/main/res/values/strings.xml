@@ -400,5 +400,6 @@
     <string name="waypoint_flight_altitude">巡航高度</string>
     <string name="altitude_m">米</string>
     <string name="waypoint_default_altitude">30</string>
+    <string name="waypoint_operator_error">任务操作出现异常：%1$s，%2$s</string>
 
 </resources>

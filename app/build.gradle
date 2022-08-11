@@ -107,6 +107,7 @@ dependencies {
          * Both will greatly reducing the size of the APK.
          */
         exclude module: 'library-anti-distortion'
+        exclude group: "com.amap.api"
         //exclude module: 'fly-safe-database'
     })
     compileOnly 'com.dji:dji-sdk-provided:4.16.1'
@@ -124,6 +125,7 @@ dependencies {
         exclude module: "location"
         exclude module: "search"
         exclude module: "3dmap"
+        exclude group: "com.amap.api"
         //exclude module: 'fly-safe-database'
     })
 
@@ -153,4 +155,7 @@ dependencies {
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.4'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+
+    implementation 'com.amap.api:3dmap:9.4.0'
+    implementation 'com.amap.api:location:6.1.0'
 }
