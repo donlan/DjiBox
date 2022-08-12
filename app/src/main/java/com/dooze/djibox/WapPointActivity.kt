@@ -13,6 +13,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import com.amap.api.location.AMapLocation
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps.AMap
@@ -119,7 +120,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         }
         binding.mapView.map.myLocationStyle = MyLocationStyle().apply {
             this.showMyLocation(true)
-            myLocationType(MyLocationStyle.LOCATION_TYPE_FOLLOW)
+            myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW)
         }
 
         AMapLocationClient.updatePrivacyShow(this, true, true)
@@ -133,8 +134,13 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         locationClient.setLocationOption(AMapLocationClientOption().apply {
             locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
         })
+        var firstLocation = true
         locationClient.setLocationListener {
             binding.mapView.map.myLocation.set(it)
+            if (firstLocation) {
+                zoomTo(it.point)
+            }
+            firstLocation = false
         }
         locationClient.startLocation()
 
@@ -194,14 +200,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
             }
             R.id.ivMyLocation -> {
                 locationClient?.lastKnownLocation?.let {
-                    binding.mapView.map.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            LatLng(
-                                it.latitude,
-                                it.longitude
-                            ), 17f
-                        )
-                    )
+                    zoomTo(it.point, 17f)
                 }
             }
             R.id.ivLayer -> {
@@ -225,6 +224,12 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                 }.show()
             }
         }
+    }
+
+    private fun zoomTo(point: LatLng, zoom: Float = 17f) {
+        binding.mapView.map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(point, zoom)
+        )
     }
 
     private fun showConfigSheet() {
@@ -382,3 +387,6 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 }
+
+val AMapLocation.point: LatLng
+    get() = LatLng(this.latitude, this.longitude)
