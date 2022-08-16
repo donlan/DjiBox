@@ -1,6 +1,5 @@
 package com.dooze.djibox
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -8,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.MenuPopupWindow
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -145,6 +143,8 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         locationClient.startLocation()
 
         waypointMissionOperator.addListener(waypointMissionOperatorListener)
+
+        onClick(binding.ivMyLocation)
     }
 
 
@@ -253,24 +253,41 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                     .maxFlightSpeed(speed.toFloat())
                     .headingMode(headingMode)
                     .flightPathMode(pathMode)
-                    .addWaypoint(Waypoint())
-
-                markers.forEach {
-                    builder.addWaypoint(
+                    .repeatTimes(1)
+                    .gotoFirstWaypointMode(WaypointMissionGotoWaypointMode.SAFELY)
+                    .setMissionID(1)
+                    .waypointList(markers.map {
                         Waypoint(
                             it.position.latitude,
                             it.position.longitude,
                             altitude
                         )
+                    })
+                    .waypointCount(markers.size)
+
+
+                val precheckError = builder.checkParameters()
+                if (precheckError != null) {
+                    showSnack(
+                        getString(
+                            R.string.waypoint_config_error,
+                            precheckError.description
+                        )
                     )
-                }
-                waypointMissionBuilder = builder
-                currentMission = builder.build()
-                val error = waypointMissionOperator.loadMission(currentMission!!)
-                if (error == null) {
-                    showSnack(getString(R.string.waypoint_config_success))
                 } else {
-                    showSnack(getString(R.string.waypoint_config_error, error.errorCode.toString()))
+                    waypointMissionBuilder = builder
+                    currentMission = builder.build()
+                    val error = waypointMissionOperator.loadMission(currentMission!!)
+                    if (error == null) {
+                        showSnack(getString(R.string.waypoint_config_success))
+                    } else {
+                        showSnack(
+                            getString(
+                                R.string.waypoint_config_error,
+                                error.errorCode.toString()
+                            )
+                        )
+                    }
                 }
             }
         }.show(supportFragmentManager, ConfigSheet::class.java.simpleName)
@@ -342,6 +359,8 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             val binding = binding!!
+            binding.speedSeekBar.progress = 5
+            binding.tvSpeedValue.text = "${binding.speedSeekBar.progress} m/s"
             binding.tvConfirm.setOnClickListener {
                 confirmCallback?.invoke(
                     binding.speedSeekBar.progress,
