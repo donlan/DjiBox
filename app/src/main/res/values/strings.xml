@@ -401,5 +401,7 @@
     <string name="altitude_m">米</string>
     <string name="waypoint_default_altitude">30</string>
     <string name="waypoint_operator_error">任务操作出现异常：%1$s，%2$s</string>
+    <string name="map_long_press_to_pick">长按选取地点</string>
+    <string name="fun_hotpoint">热点飞行</string>
 
 </resources>

@@ -17,4 +17,5 @@
     <color name="textColorSecondary">#474545</color>
 
     <color name="alert">#F44336</color>
+    <color name="content_bg">#FFF</color>
 </resources>

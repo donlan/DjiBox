@@ -4,4 +4,8 @@
     <item
         android:id="@+id/menuWayPoint"
         android:title="@string/fun_waypoint" />
+
+    <item
+        android:id="@+id/menuHotPoint"
+        android:title="@string/fun_hotpoint" />
 </menu>
