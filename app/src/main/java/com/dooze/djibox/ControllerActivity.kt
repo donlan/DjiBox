@@ -8,9 +8,13 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.Gravity
+import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.doOnPreDraw
+import androidx.core.view.updateLayoutParams
 import com.dooze.djibox.databinding.ActivityControllerBinding
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.map.PickLocationSheet
 
 /**
  * @author: liangguidong
@@ -41,6 +45,11 @@ class ControllerActivity : AppCompatActivity() {
         } else {
             init()
         }
+        binding.rootLayout.doOnPreDraw {
+            binding.fragmentContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                width = resources.displayMetrics.heightPixels
+            }
+        }
     }
 
     private fun init() {
@@ -54,6 +63,15 @@ class ControllerActivity : AppCompatActivity() {
                     when (menu.itemId) {
                         R.id.menuWayPoint -> {
                             startActivity(Intent(this@ControllerActivity, WapPointActivity::class.java))
+                        }
+                        R.id.menuHotPoint -> {
+                            val fragment = PickLocationSheet.newInstance {
+                                showSnack("TODO HotPoint")
+                            }
+                            supportFragmentManager.beginTransaction()
+                                .replace(R.id.fragment_container, fragment)
+                                .show(fragment)
+                                .commit()
                         }
                     }
                     true

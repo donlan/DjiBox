@@ -37,16 +37,12 @@ import com.dooze.djibox.internal.utils.GeneralUtils;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.squareup.otto.Subscribe;
 
-import dji.sdk.sdkmanager.LDMModule;
-import dji.sdk.sdkmanager.LDMModuleType;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.common.realname.AppActivationState;
@@ -65,6 +61,8 @@ import dji.sdk.realname.AppActivationManager;
 import dji.sdk.sdkmanager.BluetoothProductConnector;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
+import dji.sdk.sdkmanager.LDMModule;
+import dji.sdk.sdkmanager.LDMModuleType;
 import dji.sdk.useraccount.UserAccountManager;
 
 /**
@@ -161,6 +159,7 @@ public class MainContent extends RelativeLayout {
 
         //mBtnBluetooth.setEnabled(false);
 
+        checkAndRequestPermissions();
 
         mBtnRegisterApp.setOnClickListener(new OnClickListener() {
             @Override

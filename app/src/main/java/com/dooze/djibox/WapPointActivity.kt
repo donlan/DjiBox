@@ -24,9 +24,12 @@ import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dji.common.error.DJIError
+import dji.common.mission.hotpoint.HotpointMission
 import dji.common.mission.waypoint.*
+import dji.sdk.mission.hotpoint.HotpointMissionOperator
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.sdkmanager.DJISDKManager
+import kotlinx.coroutines.supervisorScope
 
 /**
  * @author: liangguidong
