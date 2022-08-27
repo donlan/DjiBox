@@ -1,60 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/bg_sheet"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_sheet">
 
 
     <com.amap.api.maps.TextureMapView
         android:id="@+id/map_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-         />
+        android:layout_height="match_parent" />
 
     <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="-10dp"
         android:background="@drawable/bg_gradient_tb"
         app:layout_constraintBottom_toBottomOf="@id/ivClose"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="-10dp"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivClose"
-        android:src="@drawable/ic_close"
-        android:layout_margin="12dp"
-        android:padding="12dp"
-        android:background="@color/gray_progress_bg"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@color/gray_progress_bg"
+        android:padding="12dp"
+        android:src="@drawable/ic_close"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tvHint"
-        android:textSize="12sp"
-        android:text="@string/map_long_press_to_pick"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/ivClose"
-        app:layout_constraintBottom_toBottomOf="@id/ivClose"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="@string/map_long_press_to_pick"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@id/ivClose"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivClose" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/ivRadius"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="24dp"
+        android:background="@drawable/round_btn_pressed"
+        android:padding="8dp"
+        android:src="@drawable/ic_adjust"
+        app:layout_constraintBottom_toTopOf="@id/ivMyLocation"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layoutRadiusSeek"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:background="@color/content_bg"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/ivRadius"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivRadius">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvRadiusHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp"
+            android:text="@string/map_pick_point_radius_progress"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/radiusSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="490"
+            android:paddingVertical="12dp"
+            android:progress="90" />
+
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ivMyLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:padding="8dp"
-        android:background="@drawable/round_btn_pressed"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/ic_my_location" />
+        android:layout_margin="24dp"
+        android:background="@drawable/round_btn_pressed"
+        android:padding="8dp"
+        android:src="@drawable/ic_my_location"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

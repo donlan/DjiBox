@@ -403,5 +403,31 @@
     <string name="waypoint_operator_error">任务操作出现异常：%1$s，%2$s</string>
     <string name="map_long_press_to_pick">长按选取地点</string>
     <string name="fun_hotpoint">热点飞行</string>
+    <string name="map_pick_point_radius_progress">半径：%1$s 米</string>
+    <string name="hot_point_need_set_radius_alert">需要制定热点飞行半径</string>
+    <string name="hot_point_mission_config_title">配置热点飞行</string>
+    <string name="hotpoint_flight_altitude">飞行高度</string>
+    <string name="hotpoint_angular_velocity">角速度</string>
+    <string name="hotpoint_clockwise_title">是否顺时针飞行</string>
+    <string name="hot_point_clockwise_off">逆时针飞行</string>
+    <string name="hot_point_clockwise_on">顺时针飞行</string>
+    <string name="hotpoint_start_point_title">开始飞行方向点</string>
+    <string name="hot_point_start_point_north">北</string>
+    <string name="hot_point_start_point_south">南</string>
+    <string name="hot_point_start_point_east">东</string>
+    <string name="hot_point_start_point_west">西</string>
+    <string name="hot_point_start_point_nearest">最近</string>
+    <string name="hotpoint_heading_title">HeadingMode</string>
+    <string name="hot_point_heading_looking_forward">Looking Forward</string>
+    <string name="hot_point_heading_looking_backward">Looking Backward</string>
+    <string name="hot_point_heading_toward_hot_point">Towards Hot Point</string>
+    <string name="hot_point_heading_away_from_hot_point">Away from hot point</string>
+    <string name="hot_point_heading_remote_controller">Controlled by remote controller</string>
+    <string name="hot_point_heading_using_initial">Using Initial</string>
+    <string name="hot_pooint_config_error">配置热点飞行任务失败。%1$s</string>
+    <string name="hot_pooint_start_mission_error">开始热点任务失败。%1$s</string>
+    <string name="hot_pooint_execution_update">热点飞行任务更新。%1$s</string>
+    <string name="hot_pooint_execution_finsish_success">热点任务执行成功</string>
+    <string name="hot_pooint_execution_error">热点飞行任务执行异常。%1$s</string>
 
 </resources>

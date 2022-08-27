@@ -1,21 +1,21 @@
 package com.dooze.djibox.map
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps.CameraUpdateFactory
-import com.amap.api.maps.model.BitmapDescriptorFactory
-import com.amap.api.maps.model.LatLng
-import com.amap.api.maps.model.MarkerOptions
-import com.amap.api.maps.model.MyLocationStyle
+import com.amap.api.maps.model.*
 import com.dooze.djibox.R
 import com.dooze.djibox.databinding.SheetMapPickLocationBinding
 import com.dooze.djibox.extensions.makeVibrate
@@ -23,9 +23,7 @@ import com.dooze.djibox.point
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import pdb.app.base.extensions.dp
-import pdb.app.base.extensions.roundedCorner
-import pdb.app.base.extensions.topRoundedCorner
+import pdb.app.base.extensions.*
 
 /**
  * @author 梁桂栋
@@ -36,15 +34,18 @@ import pdb.app.base.extensions.topRoundedCorner
  * @version 1.0
  */
 
-class PickLocationSheet : BottomSheetDialogFragment() {
+class PickLocationSheet : BottomSheetDialogFragment(), View.OnClickListener {
 
     private var binding: SheetMapPickLocationBinding? = null
 
     private var locationClient: AMapLocationClient? = null
 
-    private var listener: ((point: LatLng) -> Unit)? = null
+    private var listener: ((point: LatLng?, radius: Double?) -> Unit)? = null
 
-    private var attachDialog = false
+    private var attachType: Int = ATTACH_SHEET
+
+    private var pickedMarker: Marker? = null
+    private var radiusCircle: Circle? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,8 +59,9 @@ class PickLocationSheet : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        attachDialog = arguments?.getBoolean("AttachDialog") == true
+        attachType = arguments?.getInt("AttachType") ?: ATTACH_SHEET
         val binding = binding!!
+        binding.ivRadius.isEnable = false
         binding.ivClose.roundedCorner(-1)
         binding.root.topRoundedCorner(16.dp(view.context))
         binding.ivClose.setOnClickListener {
@@ -70,24 +72,57 @@ class PickLocationSheet : BottomSheetDialogFragment() {
                 zoomTo(it.point, 17f)
             }
         }
+        binding.ivRadius.setOnClickListener(this)
         binding.mapView.onCreate(savedInstanceState)
 
+
+        binding.radiusSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.tvRadiusHint.text = getString(
+                    R.string.map_pick_point_radius_progress,
+                    (progress + 10).toString()
+                )
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+                val marker = pickedMarker ?: return
+                val radius = (seekBar.progress + 10).toDouble()
+                val circle = radiusCircle ?: binding.mapView.map.addCircle(CircleOptions().apply {
+                    center(marker.position)
+                    radius(radius)
+                    fillColor(ContextCompat.getColor(requireContext(), R.color.map_radius_fill))
+                    strokeWidth(1.dp(requireContext()))
+                    strokeColor(ContextCompat.getColor(requireContext(), R.color.map_radius_stoker))
+                }).also {
+                    radiusCircle = it
+                }
+                circle.center = marker.position
+                circle.radius = radius
+            }
+
+        })
+
         binding.mapView.map.setOnMapLongClickListener {
-            binding.mapView.map.addMarker(MarkerOptions().apply {
+            pickedMarker = binding.mapView.map.addMarker(MarkerOptions().apply {
                 position(it)
                 val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_loc, null)!!
                 drawable.setTint(ContextCompat.getColor(requireContext(), R.color.alert))
                 this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
             })
+            binding.ivRadius.isEnable = true
+            binding.layoutRadiusSeek.isVisible = true
+            binding.tvRadiusHint.text = getString(
+                R.string.map_pick_point_radius_progress,
+                (binding.radiusSeekBar.progress + 10).toString()
+            )
             makeVibrate()
-            lifecycleScope.launch {
-                delay(300)
-                listener?.invoke(it)
-                close()
-            }
         }
         binding.mapView.map.myLocationStyle = MyLocationStyle().apply {
             this.showMyLocation(true)
+            radiusFillColor(Color.TRANSPARENT)
             myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW)
         }
 
@@ -118,14 +153,27 @@ class PickLocationSheet : BottomSheetDialogFragment() {
         }
     }
 
-    fun close() {
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.ivRadius -> {
+                binding?.layoutRadiusSeek?.toggleVisible()
+            }
+        }
+    }
+
+
+    private fun close() {
+        if (attachType == ATTACH_OTHER_ACTIVITY) {
+            listener?.invoke(pickedMarker?.position, radiusCircle?.radius)
+            return
+        }
         locationClient?.onDestroy()
         runCatching {
             binding?.mapView?.onDestroy()
         }
         locationClient = null
         listener = null
-        if (attachDialog) {
+        if (attachType == ATTACH_CUR_ACTIVITY) {
             dismissAllowingStateLoss()
             return
         }
@@ -157,34 +205,36 @@ class PickLocationSheet : BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        locationClient?.onDestroy()
-//        runCatching {
-//            binding?.mapView?.onDestroy()
-//        }
-//        listener = null
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        locationClient?.onDestroy()
+        listener = null
     }
 
 
     companion object {
 
+        const val ATTACH_SHEET = 0
+        const val ATTACH_CUR_ACTIVITY = 1
+        const val ATTACH_OTHER_ACTIVITY = 2
+
         fun newInstance(
-            attachDialog: Boolean = false,
-            listener: (point: LatLng) -> Unit
+            attachType: Int = ATTACH_SHEET,
+            listener: (point: LatLng?, radius: Double?) -> Unit
         ): PickLocationSheet {
             val sheet = PickLocationSheet()
             sheet.listener = listener
             sheet.arguments = Bundle().apply {
-                putBoolean("AttachDialog", attachDialog)
+                putInt("AttachType", attachType)
             }
             return sheet
         }
 
-        fun show(fm: FragmentManager, listener: (point: LatLng) -> Unit) {
-            val sheet = newInstance(true, listener)
+        fun show(fm: FragmentManager, listener: (point: LatLng?, radius: Double?) -> Unit) {
+            val sheet = newInstance(ATTACH_SHEET, listener)
             sheet.show(fm, PickLocationSheet::class.java.simpleName)
         }
     }
