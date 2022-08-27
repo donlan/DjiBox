@@ -34,8 +34,8 @@
         android:allowBackup="true"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_dji_launcher"
-        android:roundIcon="@mipmap/ic_dji_launcher_round"
         android:label="@string/sample_app_name"
+        android:roundIcon="@mipmap/ic_dji_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
@@ -76,7 +76,7 @@
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="443744ca6bc3fcf61b40785deaf344eb"/>
+            android:value="443744ca6bc3fcf61b40785deaf344eb" />
         <!-- Required for receiving accessory attachment events.
             This is necessary for product when connecting over USB. -->
 
@@ -120,14 +120,20 @@
 
         <activity
             android:name=".ControllerActivity"
+            android:exported="false"
             android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="false" />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".WapPointActivity"
+            android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.Dialog"
+            android:name=".map.PickLocationActivity"
             android:exported="false" />
     </application>
 

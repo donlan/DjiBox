@@ -32,8 +32,6 @@ import kotlinx.coroutines.launch
 import kotlin.math.min
 
 
-
-
 fun View.roundedCorner(radiusDP: Int = -1) {
     outlineProvider = object : ViewOutlineProvider() {
         override fun getOutline(view: View?, outline: Outline?) {
@@ -80,7 +78,6 @@ fun <T : View> View.bindView(@IdRes idRes: Int): Lazy<T> {
 fun <T : View> Fragment.bindView(@IdRes idRes: Int): Lazy<T> {
     return lazyFast { requireView().findViewById<T>(idRes) }
 }
-
 
 
 fun EditText.endSelection() {
@@ -195,4 +192,8 @@ fun View.fadeIn(): ObjectAnimator? {
     animator.duration = 250L
     animator.start()
     return animator
+}
+
+fun View.toggleVisible() {
+    isVisible = !isVisible
 }

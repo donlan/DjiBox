@@ -18,4 +18,6 @@
 
     <color name="alert">#F44336</color>
     <color name="content_bg">#FFF</color>
+    <color name="map_radius_fill">#4D15BD1C</color>
+    <color name="map_radius_stoker">#15BD1C</color>
 </resources>

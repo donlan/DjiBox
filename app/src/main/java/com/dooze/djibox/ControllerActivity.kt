@@ -5,16 +5,24 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.Gravity
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
+import androidx.fragment.app.Fragment
+import com.amap.api.maps.model.LatLng
 import com.dooze.djibox.databinding.ActivityControllerBinding
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.map.PickLocationActivity
 import com.dooze.djibox.map.PickLocationSheet
+import dji.common.mission.hotpoint.HotpointMission
+import dji.sdk.sdkmanager.DJISDKManager
 
 /**
  * @author: liangguidong
@@ -26,6 +34,10 @@ import com.dooze.djibox.map.PickLocationSheet
 class ControllerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityControllerBinding
+
+    private val hotpointMissionOperator by lazy {
+        DJISDKManager.getInstance().missionControl.hotpointMissionOperator
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,16 +74,15 @@ class ControllerActivity : AppCompatActivity() {
                 setOnMenuItemClickListener { menu ->
                     when (menu.itemId) {
                         R.id.menuWayPoint -> {
-                            startActivity(Intent(this@ControllerActivity, WapPointActivity::class.java))
+                            startActivity(
+                                Intent(
+                                    this@ControllerActivity,
+                                    WapPointActivity::class.java
+                                )
+                            )
                         }
                         R.id.menuHotPoint -> {
-                            val fragment = PickLocationSheet.newInstance {
-                                showSnack("TODO HotPoint")
-                            }
-                            supportFragmentManager.beginTransaction()
-                                .replace(R.id.fragment_container, fragment)
-                                .show(fragment)
-                                .commit()
+                            pickLocation.launch(0)
                         }
                     }
                     true
@@ -79,6 +90,28 @@ class ControllerActivity : AppCompatActivity() {
             }.show()
         }
     }
+
+
+    private val pickLocation =
+        registerForActivityResult(object : ActivityResultContract<Int, Pair<LatLng, Double?>?>() {
+            override fun createIntent(context: Context, input: Int): Intent {
+                return Intent(context, PickLocationActivity::class.java)
+            }
+
+            override fun parseResult(resultCode: Int, intent: Intent?): Pair<LatLng, Double?>? {
+                val point: LatLng = intent?.extras?.getParcelable("Location") ?: return null
+                val radius = intent.extras?.getDouble("Radius")
+                return Pair(point, radius)
+            }
+
+        }) {
+            val (point, radius) = it ?: return@registerForActivityResult
+            if (radius == null) {
+                showSnack(getString(R.string.hot_point_need_set_radius_alert))
+                return@registerForActivityResult
+            }
+            showFragment(HotPointConfigFragment.newInstance(point, radius))
+        }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -91,6 +124,14 @@ class ControllerActivity : AppCompatActivity() {
         } else {
             showSnack(getString(R.string.app_require_all_permission_granted))
         }
+    }
+
+
+    private fun showFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .show(fragment)
+            .commit()
     }
 
 }
