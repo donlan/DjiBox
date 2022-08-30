@@ -77,17 +77,11 @@ class PickLocationSheet : BottomSheetDialogFragment(), View.OnClickListener {
 
 
         binding.radiusSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 binding.tvRadiusHint.text = getString(
                     R.string.map_pick_point_radius_progress,
                     (progress + 10).toString()
                 )
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
                 val marker = pickedMarker ?: return
                 val radius = (seekBar.progress + 10).toDouble()
                 val circle = radiusCircle ?: binding.mapView.map.addCircle(CircleOptions().apply {
@@ -101,6 +95,13 @@ class PickLocationSheet : BottomSheetDialogFragment(), View.OnClickListener {
                 }
                 circle.center = marker.position
                 circle.radius = radius
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+
             }
 
         })

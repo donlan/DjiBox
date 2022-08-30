@@ -11,6 +11,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.isVisible
 import com.amap.api.location.AMapLocation
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
@@ -24,12 +25,10 @@ import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dji.common.error.DJIError
-import dji.common.mission.hotpoint.HotpointMission
 import dji.common.mission.waypoint.*
-import dji.sdk.mission.hotpoint.HotpointMissionOperator
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.sdkmanager.DJISDKManager
-import kotlinx.coroutines.supervisorScope
+import pdb.app.base.extensions.toggleVisible
 
 /**
  * @author: liangguidong
@@ -97,6 +96,22 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         binding.tvStop.setOnClickListener(this)
         binding.ivMyLocation.setOnClickListener(this)
         binding.ivLayer.setOnClickListener(this)
+
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.actionMenuToggle -> {
+                    binding.layoutMenus.toggleVisible()
+                    it.icon = ContextCompat.getDrawable(
+                        this, if (binding.layoutMenus.isVisible) {
+                            R.drawable.ic_cancel
+                        } else {
+                            R.drawable.ic_apps
+                        }
+                    )
+                }
+            }
+            true
+        }
 
 
         binding.mapView.map.setOnMapLongClickListener {
@@ -170,9 +185,6 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         super.onDestroy()
         locationClient?.onDestroy()
         locationClient = null
-        kotlin.runCatching {
-            binding.mapView.onDestroy()
-        }
     }
 
     override fun onClick(v: View?) {
