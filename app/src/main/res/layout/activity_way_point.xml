@@ -13,6 +13,7 @@
         android:background="@color/colorAccent"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:title="@string/fun_waypoint"
+        app:menu="@menu/way_point_menu"
         app:titleTextColor="@color/textColorPrimaryLight" />
 
     <com.amap.api.maps.MapView
@@ -22,109 +23,125 @@
         android:layout_below="@id/toolbar" />
 
     <LinearLayout
-        android:id="@+id/pointsLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/layoutMenus"
+        android:layout_alignParentEnd="true"
         android:layout_below="@id/toolbar"
-        android:orientation="horizontal"
-        android:paddingVertical="8dp">
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tvPickPoint"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/pointsLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_action_view"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:text="@string/long_press_to_pick_point"
-            android:textColor="@color/textColorPrimaryLight"
-            android:textSize="14sp" />
+            android:layout_below="@id/toolbar"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
 
-        <TextView
-            android:id="@+id/tvPopPoint"
-            android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvPickPoint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_action_view"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:text="@string/long_press_to_pick_point"
+                android:textColor="@color/textColorPrimaryLight"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvPopPoint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_action_view"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:text="@string/pop_preview_point"
+                android:textColor="@color/textColorPrimaryLight"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/missionLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_action_view"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:text="@string/pop_preview_point"
-            android:textColor="@color/textColorPrimaryLight"
-            android:textSize="14sp" />
+            android:layout_below="@id/pointsLayout"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
+
+            <TextView
+                android:id="@+id/tvConfig"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_action_view"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp"
+                android:text="@string/waypoint_config_task"
+                android:textColor="@color/textColorPrimaryLight"
+                android:textSize="14sp" />
+
+            <TextView
+                android:paddingHorizontal="10dp"
+                android:id="@+id/tvUpload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_action_view"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:text="@string/waypoint_upload_task_data"
+                android:textColor="@color/textColorPrimaryLight"
+                android:textSize="14sp" />
+
+
+            <TextView
+                android:paddingHorizontal="10dp"
+                android:id="@+id/tvStart"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_action_view"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:text="@string/waypoint_start_task"
+                android:textColor="@color/textColorPrimaryLight"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvStop"
+                android:layout_width="0dp"
+                android:paddingHorizontal="10dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_action_view"
+                android:gravity="center"
+                android:paddingVertical="12dp"
+                android:text="@string/waypoint_stop_task"
+                android:textColor="@color/textColorPrimaryLight"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/missionLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/pointsLayout"
-        android:orientation="horizontal"
-        android:paddingVertical="8dp">
 
-        <TextView
-            android:id="@+id/tvConfig"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_action_view"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:text="@string/waypoint_config_task"
-            android:textColor="@color/textColorPrimaryLight"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvUpload"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_action_view"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:text="@string/waypoint_upload_task_data"
-            android:textColor="@color/textColorPrimaryLight"
-            android:textSize="14sp" />
-
-
-        <TextView
-            android:id="@+id/tvStart"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_action_view"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:text="@string/waypoint_start_task"
-            android:textColor="@color/textColorPrimaryLight"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvStop"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_action_view"
-            android:gravity="center"
-            android:paddingVertical="12dp"
-            android:text="@string/waypoint_stop_task"
-            android:textColor="@color/textColorPrimaryLight"
-            android:textSize="14sp" />
-
-    </LinearLayout>
 
 
     <androidx.appcompat.widget.AppCompatImageView
