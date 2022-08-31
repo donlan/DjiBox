@@ -429,5 +429,11 @@
     <string name="hot_pooint_execution_update">热点飞行任务更新。%1$s</string>
     <string name="hot_pooint_execution_finsish_success">热点任务执行成功</string>
     <string name="hot_pooint_execution_error">热点飞行任务执行异常。%1$s</string>
+    <string name="waypoint_heading_title">Heading</string>
+    <string name="waypoint_gimbal_pitch_title">Gimbal Pitch</string>
+    <string name="waypoint_corner_radius_title">CornerRadius</string>
+    <string name="waypoint_repeat_times_title">重复执行次数</string>
+    <string name="waypoint_shoot_interval_title">拍照间隔</string>
+    <string name="waypoint_default_point_config_title">配置巡航点</string>
 
 </resources>
