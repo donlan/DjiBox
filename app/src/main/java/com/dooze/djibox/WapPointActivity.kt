@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import com.amap.api.location.AMapLocation
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
@@ -20,9 +21,13 @@ import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.model.*
 import com.dooze.djibox.databinding.ActivityWayPointBinding
+import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
+import com.dooze.djibox.databinding.FragmentWayPointConfigBinding
 import com.dooze.djibox.databinding.SheetWaypointConfigBinding
+import com.dooze.djibox.extensions.behavior
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
@@ -133,6 +138,10 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                 }))
                 makeVibrate()
             }
+        }
+        binding.mapView.map.addOnMarkerClickListener {
+            PointConfigSheet.show(supportFragmentManager)
+            true
         }
         binding.mapView.map.myLocationStyle = MyLocationStyle().apply {
             this.showMyLocation(true)
@@ -346,6 +355,56 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                 showSnack(it.description)
             }
         }
+    }
+
+
+    class PointConfigSheet : BottomSheetDialogFragment(), View.OnClickListener {
+
+        private var binding: FragmentWayPointConfigBinding? = null
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+
+            return FragmentWayPointConfigBinding.inflate(layoutInflater, container, false).also {
+                binding = it
+            }.root
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            with(binding!!) {
+                ivClose.setOnClickListener(this@PointConfigSheet)
+                ibDone.setOnClickListener(this@PointConfigSheet)
+            }
+        }
+
+        override fun onClick(p0: View?) {
+            when(p0?.id) {
+                R.id.ivClose -> {
+                    dismissAllowingStateLoss()
+                }
+                R.id.ibDone -> {
+                    dismissAllowingStateLoss()
+                }
+            }
+        }
+
+        override fun onStart() {
+            super.onStart()
+            behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+
+        companion object {
+            fun show(fm: FragmentManager, waypoint: Waypoint? = null) {
+                val sheet = PointConfigSheet()
+                sheet.show(fm, PointConfigSheet::class.java.simpleName)
+            }
+        }
+
+
     }
 
 
