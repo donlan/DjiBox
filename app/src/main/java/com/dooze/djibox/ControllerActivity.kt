@@ -1,18 +1,18 @@
 package com.dooze.djibox
 
-import android.os.Build
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.view.GravityCompat
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
@@ -20,8 +20,6 @@ import com.amap.api.maps.model.LatLng
 import com.dooze.djibox.databinding.ActivityControllerBinding
 import com.dooze.djibox.extensions.showSnack
 import com.dooze.djibox.map.PickLocationActivity
-import com.dooze.djibox.map.PickLocationSheet
-import dji.common.mission.hotpoint.HotpointMission
 import dji.sdk.sdkmanager.DJISDKManager
 
 /**
@@ -31,7 +29,7 @@ import dji.sdk.sdkmanager.DJISDKManager
  * @lastModifyDate: 2022/8/6 12:05
  * @description:
  */
-class ControllerActivity : AppCompatActivity() {
+class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityControllerBinding
 
@@ -42,7 +40,7 @@ class ControllerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_controller)
-        binding = ActivityControllerBinding.bind(findViewById(R.id.root_layout))
+        binding = ActivityControllerBinding.bind(findViewById(R.id.rootDrawer))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(
                 this, arrayOf<String>(
@@ -62,6 +60,8 @@ class ControllerActivity : AppCompatActivity() {
                 width = resources.displayMetrics.heightPixels
             }
         }
+        binding.tvFunHotPoint.setOnClickListener(this)
+        binding.tvFunWayPoint.setOnClickListener(this)
     }
 
     private fun init() {
@@ -69,25 +69,44 @@ class ControllerActivity : AppCompatActivity() {
             finish()
         }
         binding.tvMoreFun.setOnClickListener {
-            PopupMenu(this, it, Gravity.TOP).apply {
-                this.menuInflater.inflate(R.menu.controller_more_funs, menu)
-                setOnMenuItemClickListener { menu ->
-                    when (menu.itemId) {
-                        R.id.menuWayPoint -> {
-                            startActivity(
-                                Intent(
-                                    this@ControllerActivity,
-                                    WapPointActivity::class.java
-                                )
-                            )
-                        }
-                        R.id.menuHotPoint -> {
-                            pickLocation.launch(0)
-                        }
-                    }
-                    true
-                }
-            }.show()
+            binding.root.openDrawer(Gravity.LEFT)
+//            PopupMenu(this, it, Gravity.TOP).apply {
+//                this.menuInflater.inflate(R.menu.controller_more_funs, menu)
+//                setOnMenuItemClickListener { menu ->
+//                    when (menu.itemId) {
+//                        R.id.menuWayPoint -> {
+//                            startActivity(
+//                                Intent(
+//                                    this@ControllerActivity,
+//                                    WapPointActivity::class.java
+//                                )
+//                            )
+//                        }
+//                        R.id.menuHotPoint -> {
+//                            pickLocation.launch(0)
+//                        }
+//                    }
+//                    true
+//                }
+//            }.show()
+        }
+    }
+
+    override fun onClick(p0: View?) {
+        when (p0?.id) {
+            R.id.tvFunHotPoint -> {
+                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                pickLocation.launch(0)
+            }
+            R.id.tvFunWayPoint -> {
+                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                startActivity(
+                    Intent(
+                        this@ControllerActivity,
+                        WapPointActivity::class.java
+                    )
+                )
+            }
         }
     }
 
