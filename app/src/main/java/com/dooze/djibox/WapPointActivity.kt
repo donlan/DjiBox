@@ -1,5 +1,6 @@
 package com.dooze.djibox
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.collection.ArrayMap
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -27,10 +29,12 @@ import com.dooze.djibox.databinding.SheetWaypointConfigBinding
 import com.dooze.djibox.extensions.behavior
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.widgets.MarkerIndexView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
+import dji.common.model.LocationCoordinate2D
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.sdkmanager.DJISDKManager
 import pdb.app.base.extensions.toggleVisible
@@ -49,6 +53,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
     private var isPickPointMode = false
 
     private val markers = ArrayList<Marker>()
+    private val pointConfigs = ArrayMap<Marker,Waypoint>()
 
     private var locationClient: AMapLocationClient? = null
 
@@ -131,20 +136,22 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 markers.add(binding.mapView.map.addMarker(MarkerOptions().apply {
                     position(it)
-                    val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_loc, null)!!
-                    drawable.setTint(ContextCompat.getColor(this@WapPointActivity, R.color.alert))
-                    title((markers.size + 1).toString())
-                    this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
+                    this.icon(BitmapDescriptorFactory.fromView(MarkerIndexView(this@WapPointActivity).apply {
+                        text = (markers.size + 1).toString()
+                    }))
                 }))
                 makeVibrate()
             }
         }
-        binding.mapView.map.addOnMarkerClickListener {
-            PointConfigSheet.show(supportFragmentManager)
+        binding.mapView.map.addOnMarkerClickListener { marker ->
+            PointConfigSheet.show(supportFragmentManager, pointConfigs[marker]) {
+                pointConfigs[marker] = it
+            }
             true
         }
         binding.mapView.map.myLocationStyle = MyLocationStyle().apply {
             this.showMyLocation(true)
+            radiusFillColor(Color.TRANSPARENT)
             myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW)
         }
 
@@ -207,7 +214,10 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                     showSnack(getString(R.string.waypoint_no_more_ponit))
                     return
                 }
-                markers.removeLast().remove()
+                markers.removeLast().run {
+                    pointConfigs.remove(this)
+                    remove()
+                }
                 makeVibrate()
             }
             R.id.tvConfig -> {
@@ -281,11 +291,10 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                     .gotoFirstWaypointMode(WaypointMissionGotoWaypointMode.SAFELY)
                     .setMissionID(1)
                     .waypointList(markers.map {
-                        Waypoint(
-                            it.position.latitude,
-                            it.position.longitude,
-                            altitude
-                        )
+                       val point = pointConfigs[it]?.apply {
+                           this.coordinate  = LocationCoordinate2D(it.position.latitude, it.position.longitude)
+                       } ?: Waypoint(it.position.latitude, it.position.longitude, altitude)
+                        point
                     })
                     .waypointCount(markers.size)
 
@@ -360,7 +369,11 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
 
     class PointConfigSheet : BottomSheetDialogFragment(), View.OnClickListener {
 
+        private var waypoint: Waypoint? = null
+
         private var binding: FragmentWayPointConfigBinding? = null
+
+        private var doneAction:((waypoint:Waypoint) -> Unit)? = null
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -378,6 +391,15 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
             with(binding!!) {
                 ivClose.setOnClickListener(this@PointConfigSheet)
                 ibDone.setOnClickListener(this@PointConfigSheet)
+                waypoint?.let {
+                    etAltitude.setText(it.altitude.toString())
+                    speedSeek.progress = it.speed
+                    headingSeek.progress = it.heading.toFloat()
+                    gimbalPitchSeek.progress = it.gimbalPitch
+                    cornerRadiusSeek.progress = it.cornerRadiusInMeters
+                    repeatTimesSeek.progress = it.actionRepeatTimes.toFloat()
+                    shootIntervalSeek.progress = it.shootPhotoTimeInterval
+                }
             }
         }
 
@@ -387,6 +409,17 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                     dismissAllowingStateLoss()
                 }
                 R.id.ibDone -> {
+                    val binding = binding ?: return
+                    val waypoint = (waypoint ?: Waypoint()).apply {
+                        altitude = binding.etAltitude.text.toString().toFloatOrNull() ?: 5f
+                        speed = binding.speedSeek.progress
+                        heading = binding.headingSeek.progress.toInt()
+                        gimbalPitch = binding.gimbalPitchSeek.progress
+                        cornerRadiusInMeters = binding.cornerRadiusSeek.progress
+                        actionRepeatTimes = binding.repeatTimesSeek.progress.toInt()
+                        shootPhotoTimeInterval = binding.shootIntervalSeek.progress
+                    }
+                    doneAction?.invoke(waypoint)
                     dismissAllowingStateLoss()
                 }
             }
@@ -398,8 +431,10 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         companion object {
-            fun show(fm: FragmentManager, waypoint: Waypoint? = null) {
+            fun show(fm: FragmentManager, waypoint: Waypoint? = null, doneAction:(waypoint:Waypoint) -> Unit) {
                 val sheet = PointConfigSheet()
+                sheet.waypoint = waypoint
+                sheet.doneAction = doneAction
                 sheet.show(fm, PointConfigSheet::class.java.simpleName)
             }
         }

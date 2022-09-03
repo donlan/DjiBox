@@ -68,8 +68,9 @@ class SeekbarText @JvmOverloads constructor(
     }
 
 
-    val progress: Float
+    var progress: Float
         get() = (max - min) * (binding.speedSeekBar.progress / binding.speedSeekBar.max.toFloat()) + min
+        set(value) { binding.speedSeekBar.progress = (value - min).toInt() }
 
 
     fun setValuesText(value: String) {
