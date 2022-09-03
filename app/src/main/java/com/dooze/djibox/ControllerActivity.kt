@@ -60,8 +60,14 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 width = resources.displayMetrics.heightPixels
             }
         }
+        binding.flightLocationView.onCreate(savedInstanceState)
         binding.tvFunHotPoint.setOnClickListener(this)
         binding.tvFunWayPoint.setOnClickListener(this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        binding.flightLocationView.onSaveInstance(outState)
     }
 
     private fun init() {
@@ -90,6 +96,21 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 //                }
 //            }.show()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.flightLocationView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.flightLocationView.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.flightLocationView.onDestroy()
     }
 
     override fun onClick(p0: View?) {

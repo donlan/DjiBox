@@ -173,6 +173,7 @@
 
     <!--Take off and return home buttons on left -->
     <LinearLayout
+        android:id="@+id/leftActionLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/signal"
@@ -243,6 +244,15 @@
         android:layout_below="@id/signal"
         android:visibility="gone"
         custom:excludeItem="ESCStatus" />
+
+        <com.dooze.djibox.widgets.FlightLocationView
+            android:id="@+id/flightLocationView"
+            android:layout_below="@id/signal"
+            android:layout_toEndOf="@id/leftActionLayout"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"/>
 
 
     <FrameLayout
