@@ -435,5 +435,6 @@
     <string name="waypoint_repeat_times_title">重复执行次数</string>
     <string name="waypoint_shoot_interval_title">拍照间隔</string>
     <string name="waypoint_default_point_config_title">配置巡航点</string>
+    <string name="flight_not_connected">飞行器未连接</string>
 
 </resources>
