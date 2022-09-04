@@ -436,5 +436,7 @@
     <string name="waypoint_shoot_interval_title">拍照间隔</string>
     <string name="waypoint_default_point_config_title">配置巡航点</string>
     <string name="flight_not_connected">飞行器未连接</string>
+    <string name="fun_media_manager">媒体管理</string>
+    <string name="flight_distance_to_me">无人机当前定位距离：%1$s</string>
 
 </resources>

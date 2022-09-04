@@ -5,85 +5,110 @@
        android:layout_height="match_parent">
 
     <RelativeLayout
-        android:layout_width="454dp"
+        android:id="@+id/actionsLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
 
-        <Button
-            android:id="@+id/btnResume"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content"
-            android:text="Resume"
-            android:layout_width="80dp"/>
+        <HorizontalScrollView
+            android:id="@+id/actionsScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_marginStart="120dp"
+                android:paddingTop="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <Button
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_action_view"
+                    android:id="@+id/btnResume"
+                    android:layout_marginLeft="5dp"
+                    android:layout_height="wrap_content"
+                    android:text="Resume"
+                    android:layout_width="80dp"/>
 
-        <Button
-            android:id="@+id/btnPause"
-            android:layout_toRightOf="@+id/btnResume"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content"
-            android:text="Pause"
-            android:layout_width="80dp"/>
+                <Button
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_action_view"
+                    android:id="@+id/btnPause"
+                    android:layout_toRightOf="@+id/btnResume"
+                    android:layout_marginLeft="5dp"
+                    android:layout_height="wrap_content"
+                    android:text="Pause"
+                    android:layout_width="80dp"/>
 
-        <Button
-            android:id="@+id/btnStop"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/btnPause"
-            android:text="Stop"
-            android:layout_width="60dp"/>
+                <Button
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_action_view"
+                    android:id="@+id/btnStop"
+                    android:layout_marginLeft="5dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/btnPause"
+                    android:text="Stop"
+                    android:layout_width="60dp"/>
+
+                <Button
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_action_view"
+                    android:id="@+id/btnStatus"
+                    android:layout_marginLeft="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Status"
+                    android:layout_toEndOf="@+id/btnSeek"
+                    android:layout_marginStart="25dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_width="100dp"/>
+
+                <Button
+                    android:textColor="@color/white"
+                    android:background="@drawable/bg_action_view"
+                    android:id="@+id/btnSeek"
+                    android:layout_marginLeft="5dp"
+                    android:layout_height="wrap_content"
+                    android:text="Skip"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/btnStop"
+                    android:layout_width="80dp"/>
+
+                <TextView
+                    android:text="Playback Status"
+                    android:id="@+id/tv_mediaPushInfo"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="20dp"
+                    android:visibility="invisible"
+                    tools:ignore="NotSibling"
+                    android:textColor="@color/white"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_weight="1"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignEnd="@+id/btnStatus"
+                    android:layout_marginStart="50dp"/>
+            </RelativeLayout>
+        </HorizontalScrollView>
+
+
 
         <com.dooze.djibox.internal.view.BaseCameraView
             android:id="@+id/camera_live_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:ignore="NotSibling"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/btnResume"
+            android:layout_below="@+id/actionsScroll"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp">
 
         </com.dooze.djibox.internal.view.BaseCameraView>
 
-        <Button
-            android:id="@+id/btnStatus"
-            android:layout_marginLeft="0dp"
-            android:layout_height="wrap_content"
-            android:text="Status"
-            android:layout_toEndOf="@+id/btnSeek"
-            android:layout_marginStart="25dp"
-            android:layout_alignParentTop="true"
-            android:layout_width="100dp"/>
 
-        <Button
-            android:id="@+id/btnSeek"
-            android:layout_marginLeft="5dp"
-            android:layout_height="wrap_content"
-            android:text="Skip"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/btnStop"
-            android:layout_width="80dp"/>
-
-        <TextView
-            android:text="Playback Status"
-            android:id="@+id/tv_mediaPushInfo"
-            android:layout_marginLeft="50dp"
-            android:layout_marginRight="20dp"
-            android:visibility="invisible"
-            tools:ignore="NotSibling"
-            android:textColor="@color/white"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_weight="1"
-            android:layout_alignParentBottom="true"
-            android:layout_alignEnd="@+id/btnStatus"
-            android:layout_marginStart="50dp"/>
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_marginTop="50dp"
         android:layout_width="124dp"
         android:layout_height="match_parent">
 
