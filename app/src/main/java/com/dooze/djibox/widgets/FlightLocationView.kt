@@ -3,9 +3,7 @@ package com.dooze.djibox.widgets
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
 import android.view.View
@@ -18,14 +16,17 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.updatePadding
 import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
+import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.MapView
-import com.amap.api.maps.model.BitmapDescriptorFactory
-import com.amap.api.maps.model.LatLng
-import com.amap.api.maps.model.Marker
-import com.amap.api.maps.model.MarkerOptions
+import com.amap.api.maps.model.*
 import com.dooze.djibox.R
+import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.map.point
+import com.dooze.djibox.map.zoomTo
+import com.dooze.djibox.point
 import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
 import pdb.app.base.extensions.dpInt
@@ -55,7 +56,9 @@ class FlightLocationView @JvmOverloads constructor(
 
     private var mapShapeAnimator: Animator? = null
     private var flightController: FlightController? = null
-    private var flightMarker:Marker? = null
+    private var flightMarker: Marker? = null
+
+    private var locationClient: AMapLocationClient? = null
 
     init {
         roundedCorner(8)
@@ -80,6 +83,16 @@ class FlightLocationView @JvmOverloads constructor(
         doOnPreDraw {
             mapShapeAnim(isExpended)
         }
+
+        mapView.map.setOnMarkerClickListener {
+            val distance = AMapUtils.calculateLineDistance(
+                it.position,
+                LatLng(mapView.map.myLocation.latitude, mapView.map.myLocation.longitude)
+            )
+            showSnack(context.getString(R.string.flight_distance_to_me, distance.toString()))
+            true
+        }
+
     }
 
 
@@ -99,19 +112,22 @@ class FlightLocationView @JvmOverloads constructor(
                 val droneLocationLat = djiFlightControllerCurrentState.aircraftLocation.latitude
                 val droneLocationLng = djiFlightControllerCurrentState.aircraftLocation.longitude
                 val point = LatLng(droneLocationLat, droneLocationLng)
-                mapView.map.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        point,
-                        17f
+                post {
+                    mapView.map.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            point,
+                            17f
+                        )
                     )
-                )
 
-                (flightMarker ?: mapView.map.addMarker(MarkerOptions().apply {
-                    position(point)
-                    val drawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_flight, null)!!
-                    drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
-                    this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
-                })).position = point
+                    (flightMarker ?: mapView.map.addMarker(MarkerOptions().apply {
+                        position(point)
+                        val drawable =
+                            ResourcesCompat.getDrawable(resources, R.drawable.ic_flight, null)!!
+                        drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
+                        this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
+                    })).position = point
+                }
             }
         } else {
             showSnack(context.getString(R.string.flight_not_connected))
@@ -142,7 +158,29 @@ class FlightLocationView @JvmOverloads constructor(
         mapView.map.uiSettings.apply {
             isZoomControlsEnabled = false
         }
-
+        if (locationClient != null) return
+        val locationClient = AMapLocationClient(context)
+        this.locationClient = locationClient
+        locationClient.setLocationOption(AMapLocationClientOption().apply {
+            locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
+        })
+        mapView.map.isMyLocationEnabled = true
+        mapView.map.myLocationStyle = MyLocationStyle().apply {
+            myLocationIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location_circle))
+            myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW)
+        }
+        var firstLocation = true
+        locationClient.setLocationListener {
+            mapView.map.myLocation.set(it)
+            if (firstLocation) {
+                mapView.zoomTo(it.point)
+            }
+            firstLocation = false
+        }
+        mapView.map.setOnMapLongClickListener {
+            mapView.zoomTo(mapView.map.myLocation?.point ?: return@setOnMapLongClickListener)
+            makeVibrate()
+        }
     }
 
     fun onSaveInstance(state: Bundle?) {
@@ -151,14 +189,18 @@ class FlightLocationView @JvmOverloads constructor(
 
     fun onResume() {
         mapView.onResume()
+        locationClient?.startLocation()
     }
 
     fun onPause() {
         mapView.onPause()
+        locationClient?.stopLocation()
     }
 
     fun onDestroy() {
-
+        mapView.map.setOnMarkerClickListener(null)
+        locationClient?.onDestroy()
+        locationClient = null
     }
 
 }

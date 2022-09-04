@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -20,8 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
 import com.dooze.djibox.R;
 import com.dooze.djibox.internal.controller.DJISampleApplication;
 import com.dooze.djibox.internal.controller.MainActivity;
@@ -32,6 +31,7 @@ import com.dooze.djibox.internal.view.PresentableView;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
 import dji.common.util.CommonCallbacks;
@@ -88,7 +88,11 @@ public class MediaPlaybackView extends LinearLayout
     });
 
     public MediaPlaybackView(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public MediaPlaybackView(Context context, AttributeSet attr) {
+        super(context, attr);
         initUI(context);
         initDJIMedia();
     }

@@ -63,6 +63,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.flightLocationView.onCreate(savedInstanceState)
         binding.tvFunHotPoint.setOnClickListener(this)
         binding.tvFunWayPoint.setOnClickListener(this)
+        binding.tvFunMediaManager.setOnClickListener(this)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -76,25 +77,6 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         }
         binding.tvMoreFun.setOnClickListener {
             binding.root.openDrawer(Gravity.LEFT)
-//            PopupMenu(this, it, Gravity.TOP).apply {
-//                this.menuInflater.inflate(R.menu.controller_more_funs, menu)
-//                setOnMenuItemClickListener { menu ->
-//                    when (menu.itemId) {
-//                        R.id.menuWayPoint -> {
-//                            startActivity(
-//                                Intent(
-//                                    this@ControllerActivity,
-//                                    WapPointActivity::class.java
-//                                )
-//                            )
-//                        }
-//                        R.id.menuHotPoint -> {
-//                            pickLocation.launch(0)
-//                        }
-//                    }
-//                    true
-//                }
-//            }.show()
         }
     }
 
@@ -127,6 +109,10 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                         WapPointActivity::class.java
                     )
                 )
+            }
+            R.id.tvFunMediaManager -> {
+                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                showFragment(MediaManagerFragment())
             }
         }
     }
