@@ -513,6 +513,11 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
 
             })
         }
+
+        override fun onStart() {
+            super.onStart()
+            behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 }
 
