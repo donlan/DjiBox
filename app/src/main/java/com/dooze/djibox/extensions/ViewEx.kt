@@ -3,6 +3,7 @@ package pdb.app.base.extensions
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.*
 import android.os.Build
 import android.view.View
@@ -196,4 +197,15 @@ fun View.fadeIn(): ObjectAnimator? {
 
 fun View.toggleVisible() {
     isVisible = !isVisible
+}
+
+fun TypedArray.safeUse(action:(ta:TypedArray) -> Unit) {
+    try {
+        action.invoke(this)
+    } catch (t:Throwable) {
+        throw t
+    } finally {
+        recycle()
+    }
+
 }

@@ -4,16 +4,21 @@ import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.doOnPreDraw
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
@@ -21,6 +26,7 @@ import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.MapView
 import com.amap.api.maps.model.*
+import com.dooze.djibox.BuildConfig
 import com.dooze.djibox.R
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.internal.controller.DJISampleApplication
@@ -51,6 +57,9 @@ class FlightLocationView @JvmOverloads constructor(
     val stateView = AppCompatImageView(context)
     val mapView = MapView(context)
 
+    private val debugInfoView = TextView(context)
+    private val mapContainer = FrameLayout(context)
+
     var isExpended: Boolean = false
         private set
 
@@ -68,11 +77,21 @@ class FlightLocationView @JvmOverloads constructor(
         stateView.updatePadding(pad, pad, pad, pad)
         stateView.setBackgroundResource(R.drawable.bg_action_view)
         stateView.roundedCorner(8)
-        mapView.roundedCorner(8)
-        addView(mapView, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        mapContainer.roundedCorner(8)
+        mapContainer.addView(mapView,LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        addView(mapContainer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(stateView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
-        mapView.pivotX = 0f
-        mapView.pivotY = 0f
+        if (BuildConfig.DEBUG) {
+            debugInfoView.setTextColor(Color.WHITE)
+            debugInfoView.setBackgroundColor(ColorUtils.setAlphaComponent(Color.BLACK,
+                (0.3 * 255).toInt()
+            ))
+            mapContainer.addView(debugInfoView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                gravity = Gravity.END or Gravity.TOP
+            })
+        }
+        mapContainer.pivotX = 0f
+        mapContainer.pivotY = 0f
         stateView.setOnClickListener {
             isExpended = !isExpended
             mapShapeAnim(isExpended)
@@ -90,6 +109,11 @@ class FlightLocationView @JvmOverloads constructor(
                 LatLng(mapView.map.myLocation.latitude, mapView.map.myLocation.longitude)
             )
             showSnack(context.getString(R.string.flight_distance_to_me, distance.toString()))
+            true
+        }
+
+        stateView.setOnLongClickListener {
+            debugInfoView.isVisible = !debugInfoView.isVisible
             true
         }
 
@@ -127,6 +151,17 @@ class FlightLocationView @JvmOverloads constructor(
                         drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
                         this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
                     })).position = point
+
+                    if (BuildConfig.DEBUG && debugInfoView.isVisible) {
+                        debugInfoView.text = buildString {
+                            append("Lat:")
+                            append(droneLocationLat)
+                            append("\n")
+                            append("Lng", droneLocationLng)
+                            append("\n")
+                            append("Time:${djiFlightControllerCurrentState.flightTimeInSeconds}s")
+                        }
+                    }
                 }
             }
         } else {
@@ -137,13 +172,13 @@ class FlightLocationView @JvmOverloads constructor(
     private fun mapShapeAnim(isExpend: Boolean) {
         mapShapeAnimator?.cancel()
         val targetScaleX =
-            if (isExpended) 1f else stateView.measuredWidth / mapView.measuredWidth.toFloat() - 0.1f
+            if (isExpended) 1f else stateView.measuredWidth / mapContainer.measuredWidth.toFloat() - 0.1f
         val targetScaleY =
-            if (isExpended) 1f else stateView.measuredHeight / mapView.measuredHeight.toFloat() - 0.1f
+            if (isExpended) 1f else stateView.measuredHeight / mapContainer.measuredHeight.toFloat() - 0.1f
         val anim = ObjectAnimator.ofPropertyValuesHolder(
-            mapView,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, mapView.scaleX, targetScaleX),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, mapView.scaleY, targetScaleY)
+            mapContainer,
+            PropertyValuesHolder.ofFloat(View.SCALE_X, mapContainer.scaleX, targetScaleX),
+            PropertyValuesHolder.ofFloat(View.SCALE_Y, mapContainer.scaleY, targetScaleY)
         )
         anim.duration = 250L
         anim.interpolator = AccelerateDecelerateInterpolator()
@@ -164,11 +199,14 @@ class FlightLocationView @JvmOverloads constructor(
         locationClient.setLocationOption(AMapLocationClientOption().apply {
             locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
         })
-        mapView.map.isMyLocationEnabled = true
         mapView.map.myLocationStyle = MyLocationStyle().apply {
             myLocationIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_my_location_circle))
-            myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW)
+            this.radiusFillColor(Color.TRANSPARENT)
+            strokeWidth(0f)
+            myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER)
         }
+        mapView.map.isMyLocationEnabled = true
+
         var firstLocation = true
         locationClient.setLocationListener {
             mapView.map.myLocation.set(it)

@@ -7,6 +7,7 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import com.dooze.djibox.R
 import com.dooze.djibox.databinding.ViewSeekBarTextBinding
+import pdb.app.base.extensions.safeUse
 
 /**
  * @author 梁桂栋
@@ -34,7 +35,7 @@ class SeekbarText @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.view_seek_bar_text, this, true)
         binding = ViewSeekBarTextBinding.bind(this)
-        context.obtainStyledAttributes(attr, R.styleable.SeekbarText).use { ta ->
+        context.obtainStyledAttributes(attr, R.styleable.SeekbarText).safeUse { ta ->
             binding.tvTitle.text = ta.getString(R.styleable.SeekbarText_sbtTitle)
             min = ta.getInt(R.styleable.SeekbarText_sbtMin, min)
             max = ta.getInt(R.styleable.SeekbarText_sbtMax, max)
