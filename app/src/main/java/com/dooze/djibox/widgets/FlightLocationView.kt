@@ -78,17 +78,25 @@ class FlightLocationView @JvmOverloads constructor(
         stateView.setBackgroundResource(R.drawable.bg_action_view)
         stateView.roundedCorner(8)
         mapContainer.roundedCorner(8)
-        mapContainer.addView(mapView,LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        mapContainer.addView(
+            mapView,
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        )
         addView(mapContainer, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         addView(stateView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
         if (BuildConfig.DEBUG) {
             debugInfoView.setTextColor(Color.WHITE)
-            debugInfoView.setBackgroundColor(ColorUtils.setAlphaComponent(Color.BLACK,
-                (0.3 * 255).toInt()
-            ))
-            mapContainer.addView(debugInfoView, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-                gravity = Gravity.END or Gravity.TOP
-            })
+            debugInfoView.setBackgroundColor(
+                ColorUtils.setAlphaComponent(
+                    Color.BLACK,
+                    (0.3 * 255).toInt()
+                )
+            )
+            mapContainer.addView(
+                debugInfoView,
+                LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                    gravity = Gravity.END or Gravity.TOP
+                })
         }
         mapContainer.pivotX = 0f
         mapContainer.pivotY = 0f
@@ -159,7 +167,20 @@ class FlightLocationView @JvmOverloads constructor(
                             append("\n")
                             append("Lng", droneLocationLng)
                             append("\n")
-                            append("Time:${djiFlightControllerCurrentState.flightTimeInSeconds}s")
+                            append("Time:${djiFlightControllerCurrentState.flightTimeInSeconds}s\n")
+                            mapView.map.myLocation?.let {
+                                append("MyLocation:\n")
+                                append("Lat:${it.latitude}\n")
+                                append("Lng${it.longitude}\n")
+                                append(
+                                    "Distance:${
+                                        AMapUtils.calculateLineDistance(
+                                            it.point,
+                                            LatLng(droneLocationLat, droneLocationLng)
+                                        )
+                                    }"
+                                )
+                            }
                         }
                     }
                 }
