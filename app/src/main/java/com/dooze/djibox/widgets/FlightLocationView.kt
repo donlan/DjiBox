@@ -33,6 +33,7 @@ import com.dooze.djibox.internal.controller.DJISampleApplication
 import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
 import com.dooze.djibox.point
+import com.dooze.djibox.utils.MapConvertUtils
 import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
 import pdb.app.base.extensions.dpInt
@@ -143,7 +144,7 @@ class FlightLocationView @JvmOverloads constructor(
             flightController?.setStateCallback { djiFlightControllerCurrentState ->
                 val droneLocationLat = djiFlightControllerCurrentState.aircraftLocation.latitude
                 val droneLocationLng = djiFlightControllerCurrentState.aircraftLocation.longitude
-                val point = LatLng(droneLocationLat, droneLocationLng)
+                val point =MapConvertUtils.WGS2GCJ(droneLocationLat, droneLocationLng)
                 post {
                     mapView.map.moveCamera(
                         CameraUpdateFactory.newLatLngZoom(
@@ -156,6 +157,7 @@ class FlightLocationView @JvmOverloads constructor(
                         position(point)
                         val drawable =
                             ResourcesCompat.getDrawable(resources, R.drawable.ic_flight, null)!!
+                                .mutate()
                         drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
                         this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
                     })).position = point
@@ -168,7 +170,7 @@ class FlightLocationView @JvmOverloads constructor(
                             append("Lng", droneLocationLng)
                             append("\n")
                             append("Time:${djiFlightControllerCurrentState.flightTimeInSeconds}s\n")
-                            mapView.map.myLocation?.let {
+                            locationClient?.lastKnownLocation?.let {
                                 append("MyLocation:\n")
                                 append("Lat:${it.latitude}\n")
                                 append("Lng${it.longitude}\n")
@@ -176,7 +178,7 @@ class FlightLocationView @JvmOverloads constructor(
                                     "Distance:${
                                         AMapUtils.calculateLineDistance(
                                             it.point,
-                                            LatLng(droneLocationLat, droneLocationLng)
+                                            point
                                         )
                                     }"
                                 )

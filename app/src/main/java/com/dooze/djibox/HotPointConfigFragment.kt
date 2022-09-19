@@ -8,6 +8,7 @@ import com.amap.api.maps.model.LatLng
 import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
 import com.dooze.djibox.extensions.lazyFast
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.utils.toDJILocation
 import dji.common.error.DJIError
 import dji.common.mission.hotpoint.HotpointHeading
 import dji.common.mission.hotpoint.HotpointMission
@@ -82,7 +83,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
             R.id.ibDone -> {
 
                 val mission = HotpointMission().apply {
-                    this.hotpoint = LocationCoordinate2D(point.latitude, point.longitude)
+                    this.hotpoint = point.toDJILocation()
                     this.radius = this@HotPointConfigFragment.radius
                     this.altitude = binding.etAltitude.text.toString().toDoubleOrNull() ?: 0.0
                     this.heading = when (binding.rgHeading.checkedRadioButtonId) {
@@ -160,7 +161,6 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     }
 
     override fun onDestroyView() {
-        DJISDKManager.getInstance().flightHubManager
         DJISDKManager.getInstance().missionControl.hotpointMissionOperator.removeListener(this)
         super.onDestroyView()
     }

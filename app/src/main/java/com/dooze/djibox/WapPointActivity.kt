@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.collection.ArrayMap
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import com.amap.api.location.AMapLocation
@@ -23,18 +21,17 @@ import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.model.*
 import com.dooze.djibox.databinding.ActivityWayPointBinding
-import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
 import com.dooze.djibox.databinding.FragmentWayPointConfigBinding
 import com.dooze.djibox.databinding.SheetWaypointConfigBinding
 import com.dooze.djibox.extensions.behavior
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.utils.toDJILocation
 import com.dooze.djibox.widgets.MarkerIndexView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
-import dji.common.model.LocationCoordinate2D
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.sdkmanager.DJISDKManager
 import pdb.app.base.extensions.toggleVisible
@@ -53,7 +50,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
     private var isPickPointMode = false
 
     private val markers = ArrayList<Marker>()
-    private val pointConfigs = ArrayMap<Marker,Waypoint>()
+    private val pointConfigs = ArrayMap<Marker, Waypoint>()
 
     private var locationClient: AMapLocationClient? = null
 
@@ -291,9 +288,10 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
                     .gotoFirstWaypointMode(WaypointMissionGotoWaypointMode.SAFELY)
                     .setMissionID(1)
                     .waypointList(markers.map {
-                       val point = pointConfigs[it]?.apply {
-                           this.coordinate  = LocationCoordinate2D(it.position.latitude, it.position.longitude)
-                       } ?: Waypoint(it.position.latitude, it.position.longitude, altitude)
+                        val latLng = it.position.toDJILocation()
+                        val point = pointConfigs[it]?.apply {
+                            this.coordinate = latLng
+                        } ?: Waypoint(latLng.latitude, latLng.longitude, altitude)
                         point
                     })
                     .waypointCount(markers.size)
@@ -373,7 +371,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
 
         private var binding: FragmentWayPointConfigBinding? = null
 
-        private var doneAction:((waypoint:Waypoint) -> Unit)? = null
+        private var doneAction: ((waypoint: Waypoint) -> Unit)? = null
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -404,7 +402,7 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         override fun onClick(p0: View?) {
-            when(p0?.id) {
+            when (p0?.id) {
                 R.id.ivClose -> {
                     dismissAllowingStateLoss()
                 }
@@ -431,7 +429,11 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         companion object {
-            fun show(fm: FragmentManager, waypoint: Waypoint? = null, doneAction:(waypoint:Waypoint) -> Unit) {
+            fun show(
+                fm: FragmentManager,
+                waypoint: Waypoint? = null,
+                doneAction: (waypoint: Waypoint) -> Unit
+            ) {
                 val sheet = PointConfigSheet()
                 sheet.waypoint = waypoint
                 sheet.doneAction = doneAction
