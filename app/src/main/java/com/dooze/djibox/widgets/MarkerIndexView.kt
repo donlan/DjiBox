@@ -8,10 +8,8 @@ import android.view.Gravity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.updatePadding
 import com.dooze.djibox.R
-import dji.common.mission.waypoint.Waypoint
 import pdb.app.base.extensions.dpInt
 import pdb.app.base.extensions.getColorCompat
-import pdb.app.base.extensions.roundedCorner
 
 /**
  * @author 梁桂栋
@@ -27,7 +25,9 @@ class MarkerIndexView @JvmOverloads constructor(
     defStyle: Int = -1
 ) : AppCompatTextView(context, attr, defStyle) {
 
-    var index:Int = 0
+    var index: Int = 0
+
+    var id: String = ""
 
     init {
         textSize = 14f

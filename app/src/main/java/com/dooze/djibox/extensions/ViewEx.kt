@@ -4,7 +4,10 @@ import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Outline
+import android.graphics.RenderEffect
+import android.graphics.Shader
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +15,7 @@ import android.view.ViewOutlineProvider
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.ColorRes
-import androidx.annotation.FloatRange
-import androidx.annotation.IdRes
-import androidx.annotation.IntRange
-import androidx.annotation.StringRes
+import androidx.annotation.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.applyCanvas
 import androidx.core.view.ViewCompat
@@ -27,9 +26,6 @@ import com.dooze.djibox.extensions.lazyFast
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.min
 
 
@@ -199,13 +195,27 @@ fun View.toggleVisible() {
     isVisible = !isVisible
 }
 
-fun TypedArray.safeUse(action:(ta:TypedArray) -> Unit) {
+fun TypedArray.safeUse(action: (ta: TypedArray) -> Unit) {
     try {
         action.invoke(this)
-    } catch (t:Throwable) {
+    } catch (t: Throwable) {
         throw t
     } finally {
         recycle()
     }
 
+}
+
+
+fun View.updateAllPadding(
+    @Px padding: Int,
+) {
+    setPadding(padding, padding, padding, padding)
+}
+
+fun View.updatePadding(
+    @Px horizontal: Int = paddingStart,
+    @Px vertical: Int = paddingTop
+) {
+    setPadding(horizontal, vertical, horizontal, vertical)
 }

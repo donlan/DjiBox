@@ -438,5 +438,15 @@
     <string name="flight_not_connected">飞行器未连接</string>
     <string name="fun_media_manager">媒体管理</string>
     <string name="flight_distance_to_me">无人机当前定位距离：%1$s</string>
+    <string name="fun_offline_map">离线地图管理</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_start">开始</string>
+    <string name="common_next">下一步</string>
+    <string name="common_done">完成</string>
+    <string name="hotpoint_start_pick_content">在地图上选取一个地点开始配置热点飞行</string>
+    <string name="hotpoint_set_radius">设置热点飞行半径（5-500米）：</string>
+    <string name="fun_map_layer">地图图层类型</string>
+    <string name="waypoint_start_pick_content">在地图上多次长按选取不同的点进行航点任务配置，单击地图上的点可单独配置,长按列表中的点可以删除已选择的点</string>
+    <string name="waypoint_start_task_upload">开始上传任务配置</string>
 
 </resources>

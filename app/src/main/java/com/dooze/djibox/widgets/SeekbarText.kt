@@ -20,8 +20,8 @@ import pdb.app.base.extensions.safeUse
 
 class SeekbarText @JvmOverloads constructor(
     context: Context,
-    attr: AttributeSet?,
-    defStyle: Int = -1
+    attr: AttributeSet? = null,
+    defStyle: Int = com.google.android.material.R.attr.seekBarStyle
 ) : RelativeLayout(context, attr, defStyle) {
 
     private val binding: ViewSeekBarTextBinding
@@ -37,10 +37,12 @@ class SeekbarText @JvmOverloads constructor(
         binding = ViewSeekBarTextBinding.bind(this)
         context.obtainStyledAttributes(attr, R.styleable.SeekbarText).safeUse { ta ->
             binding.tvTitle.text = ta.getString(R.styleable.SeekbarText_sbtTitle)
-            min = ta.getInt(R.styleable.SeekbarText_sbtMin, min)
-            max = ta.getInt(R.styleable.SeekbarText_sbtMax, max)
-            step = ta.getFloat(R.styleable.SeekbarText_sbtStep, step)
-            binding.speedSeekBar.max = ((max - min) / step).toInt()
+            setup(
+                ta.getInt(R.styleable.SeekbarText_sbtMin, min),
+                ta.getInt(R.styleable.SeekbarText_sbtMax, max),
+                ta.getFloat(R.styleable.SeekbarText_sbtStep, step)
+            )
+
             val p = ta.getInt(R.styleable.SeekbarText_sbtProgress, 0)
             binding.speedSeekBar.progress =
                 ((max - min) * (p / binding.speedSeekBar.max.toFloat()) + min).toInt()
@@ -68,11 +70,23 @@ class SeekbarText @JvmOverloads constructor(
 
     }
 
+    fun setup(min: Int, max: Int, step: Float = 1f) {
+        this.min = min
+        this.max = max
+        this.step = step
+        binding.speedSeekBar.max = ((max - min) / step).toInt()
+    }
+
 
     var progress: Float
         get() = (max - min) * (binding.speedSeekBar.progress / binding.speedSeekBar.max.toFloat()) + min
-        set(value) { binding.speedSeekBar.progress = (value - min).toInt() }
+        set(value) {
+            binding.speedSeekBar.progress = (value - min).toInt()
+        }
 
+    fun setTitle(content:String) {
+        binding.tvTitle.text = content
+    }
 
     fun setValuesText(value: String) {
         binding.tvValue.text = value
