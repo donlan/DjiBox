@@ -8,6 +8,7 @@ import com.amap.api.maps.model.LatLng
 import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
 import com.dooze.djibox.extensions.lazyFast
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.internal.controller.DJISampleApplication
 import com.dooze.djibox.utils.toDJILocation
 import dji.common.error.DJIError
 import dji.common.mission.hotpoint.HotpointHeading
@@ -78,6 +79,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivClose -> {
+                DJISampleApplication.getEventBus().post(ResetHotPoint)
                 dismiss()
             }
             R.id.ibDone -> {

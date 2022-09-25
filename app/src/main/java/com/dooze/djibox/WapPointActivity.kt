@@ -363,164 +363,162 @@ class WapPointActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
     }
+}
 
+class ConfigSheet : BottomSheetDialogFragment() {
 
-    class PointConfigSheet : BottomSheetDialogFragment(), View.OnClickListener {
+    var confirmCallback: ((
+        speed: Int,
+        altitude: Float,
+        finishAction: WaypointMissionFinishedAction,
+        headingMode: WaypointMissionHeadingMode,
+        pathMode: WaypointMissionFlightPathMode
+    ) -> Unit)? = null
 
-        private var waypoint: Waypoint? = null
+    private var binding: SheetWaypointConfigBinding? = null
 
-        private var binding: FragmentWayPointConfigBinding? = null
-
-        private var doneAction: ((waypoint: Waypoint) -> Unit)? = null
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View? {
-
-            return FragmentWayPointConfigBinding.inflate(layoutInflater, container, false).also {
-                binding = it
-            }.root
-        }
-
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            with(binding!!) {
-                ivClose.setOnClickListener(this@PointConfigSheet)
-                ibDone.setOnClickListener(this@PointConfigSheet)
-                waypoint?.let {
-                    etAltitude.setText(it.altitude.toString())
-                    speedSeek.progress = it.speed
-                    headingSeek.progress = it.heading.toFloat()
-                    gimbalPitchSeek.progress = it.gimbalPitch
-                    cornerRadiusSeek.progress = it.cornerRadiusInMeters
-                    repeatTimesSeek.progress = it.actionRepeatTimes.toFloat()
-                    shootIntervalSeek.progress = it.shootPhotoTimeInterval
-                }
-            }
-        }
-
-        override fun onClick(p0: View?) {
-            when (p0?.id) {
-                R.id.ivClose -> {
-                    dismissAllowingStateLoss()
-                }
-                R.id.ibDone -> {
-                    val binding = binding ?: return
-                    val waypoint = (waypoint ?: Waypoint()).apply {
-                        altitude = binding.etAltitude.text.toString().toFloatOrNull() ?: 5f
-                        speed = binding.speedSeek.progress
-                        heading = binding.headingSeek.progress.toInt()
-                        gimbalPitch = binding.gimbalPitchSeek.progress
-                        cornerRadiusInMeters = binding.cornerRadiusSeek.progress
-                        actionRepeatTimes = binding.repeatTimesSeek.progress.toInt()
-                        shootPhotoTimeInterval = binding.shootIntervalSeek.progress
-                    }
-                    doneAction?.invoke(waypoint)
-                    dismissAllowingStateLoss()
-                }
-            }
-        }
-
-        override fun onStart() {
-            super.onStart()
-            behavior?.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-
-        companion object {
-            fun show(
-                fm: FragmentManager,
-                waypoint: Waypoint? = null,
-                doneAction: (waypoint: Waypoint) -> Unit
-            ) {
-                val sheet = PointConfigSheet()
-                sheet.waypoint = waypoint
-                sheet.doneAction = doneAction
-                sheet.show(fm, PointConfigSheet::class.java.simpleName)
-            }
-        }
-
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return SheetWaypointConfigBinding.inflate(layoutInflater, container, false).also {
+            binding = it
+        }.root
     }
 
-
-    class ConfigSheet : BottomSheetDialogFragment() {
-
-        var confirmCallback: ((
-            speed: Int,
-            altitude: Float,
-            finishAction: WaypointMissionFinishedAction,
-            headingMode: WaypointMissionHeadingMode,
-            pathMode: WaypointMissionFlightPathMode
-        ) -> Unit)? = null
-
-        private var binding: SheetWaypointConfigBinding? = null
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View {
-            return SheetWaypointConfigBinding.inflate(layoutInflater, container, false).also {
-                binding = it
-            }.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val binding = binding!!
+        binding.speedSeekBar.progress = 5
+        binding.tvSpeedValue.text = "${binding.speedSeekBar.progress} m/s"
+        binding.tvConfirm.setOnClickListener {
+            confirmCallback?.invoke(
+                binding.speedSeekBar.progress,
+                binding.etAltitude.text.toString().toFloat(),
+                when (binding.finishActionGroup.checkedRadioButtonId) {
+                    R.id.tvActionGoHome -> WaypointMissionFinishedAction.GO_HOME
+                    R.id.tvActionToFirstPoint -> WaypointMissionFinishedAction.GO_FIRST_WAYPOINT
+                    R.id.tvActionAutoLand -> WaypointMissionFinishedAction.AUTO_LAND
+                    else -> WaypointMissionFinishedAction.NO_ACTION
+                },
+                when (binding.headingActionGroup.checkedRadioButtonId) {
+                    R.id.tvRemoteController -> WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER
+                    R.id.tvInterestPoint -> WaypointMissionHeadingMode.TOWARD_POINT_OF_INTEREST
+                    R.id.tvInitialDirection -> WaypointMissionHeadingMode.USING_INITIAL_DIRECTION
+                    R.id.tvWaypointHeading -> WaypointMissionHeadingMode.USING_WAYPOINT_HEADING
+                    else -> WaypointMissionHeadingMode.AUTO
+                },
+                when (binding.pathModeGroup.checkedRadioButtonId) {
+                    R.id.tvPathModeCurved -> WaypointMissionFlightPathMode.CURVED
+                    else -> WaypointMissionFlightPathMode.NORMAL
+                }
+            )
+            confirmCallback = null
+            dismissAllowingStateLoss()
         }
+        binding.speedSeekBar.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(
+                seekBar: SeekBar?,
+                progress: Int,
+                fromUser: Boolean
+            ) {
+                binding.tvSpeedValue.text = "$progress m/s"
+            }
 
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            super.onViewCreated(view, savedInstanceState)
-            val binding = binding!!
-            binding.speedSeekBar.progress = 5
-            binding.tvSpeedValue.text = "${binding.speedSeekBar.progress} m/s"
-            binding.tvConfirm.setOnClickListener {
-                confirmCallback?.invoke(
-                    binding.speedSeekBar.progress,
-                    binding.etAltitude.text.toString().toFloat(),
-                    when (binding.finishActionGroup.checkedRadioButtonId) {
-                        R.id.tvActionGoHome -> WaypointMissionFinishedAction.GO_HOME
-                        R.id.tvActionToFirstPoint -> WaypointMissionFinishedAction.GO_FIRST_WAYPOINT
-                        R.id.tvActionAutoLand -> WaypointMissionFinishedAction.AUTO_LAND
-                        else -> WaypointMissionFinishedAction.NO_ACTION
-                    },
-                    when (binding.headingActionGroup.checkedRadioButtonId) {
-                        R.id.tvRemoteController -> WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER
-                        R.id.tvInterestPoint -> WaypointMissionHeadingMode.TOWARD_POINT_OF_INTEREST
-                        R.id.tvInitialDirection -> WaypointMissionHeadingMode.USING_INITIAL_DIRECTION
-                        R.id.tvWaypointHeading -> WaypointMissionHeadingMode.USING_WAYPOINT_HEADING
-                        else -> WaypointMissionHeadingMode.AUTO
-                    },
-                    when (binding.pathModeGroup.checkedRadioButtonId) {
-                        R.id.tvPathModeCurved -> WaypointMissionFlightPathMode.CURVED
-                        else -> WaypointMissionFlightPathMode.NORMAL
-                    }
-                )
-                confirmCallback = null
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+}
+
+class PointConfigSheet : BottomSheetDialogFragment(), View.OnClickListener {
+
+    private var waypoint: Waypoint? = null
+
+    private var binding: FragmentWayPointConfigBinding? = null
+
+    private var doneAction: ((waypoint: Waypoint) -> Unit)? = null
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        return FragmentWayPointConfigBinding.inflate(layoutInflater, container, false).also {
+            binding = it
+        }.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        with(binding!!) {
+            ivClose.setOnClickListener(this@PointConfigSheet)
+            ibDone.setOnClickListener(this@PointConfigSheet)
+            waypoint?.let {
+                etAltitude.setText(it.altitude.toString())
+                speedSeek.progress = it.speed
+                headingSeek.progress = it.heading.toFloat()
+                gimbalPitchSeek.progress = it.gimbalPitch
+                cornerRadiusSeek.progress = it.cornerRadiusInMeters
+                repeatTimesSeek.progress = it.actionRepeatTimes.toFloat()
+                shootIntervalSeek.progress = it.shootPhotoTimeInterval
+            }
+        }
+    }
+
+    override fun onClick(p0: View?) {
+        when (p0?.id) {
+            R.id.ivClose -> {
                 dismissAllowingStateLoss()
             }
-            binding.speedSeekBar.setOnSeekBarChangeListener(object :
-                SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    binding.tvSpeedValue.text = "$progress m/s"
+            R.id.ibDone -> {
+                val binding = binding ?: return
+                val waypoint = (waypoint ?: Waypoint()).apply {
+                    altitude = binding.etAltitude.text.toString().toFloatOrNull() ?: 5f
+                    speed = binding.speedSeek.progress
+                    heading = binding.headingSeek.progress.toInt()
+                    gimbalPitch = binding.gimbalPitchSeek.progress
+                    cornerRadiusInMeters = binding.cornerRadiusSeek.progress
+                    actionRepeatTimes = binding.repeatTimesSeek.progress.toInt()
+                    shootPhotoTimeInterval = binding.shootIntervalSeek.progress
                 }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                }
-
-            })
-        }
-
-        override fun onStart() {
-            super.onStart()
-            behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+                doneAction?.invoke(waypoint)
+                dismissAllowingStateLoss()
+            }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        behavior?.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    companion object {
+        fun show(
+            fm: FragmentManager,
+            waypoint: Waypoint? = null,
+            doneAction: (waypoint: Waypoint) -> Unit
+        ) {
+            val sheet = PointConfigSheet()
+            sheet.waypoint = waypoint
+            sheet.doneAction = doneAction
+            sheet.show(fm, PointConfigSheet::class.java.simpleName)
+        }
+    }
+
+
 }
 
 val AMapLocation.point: LatLng

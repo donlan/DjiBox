@@ -16,14 +16,24 @@
     android:orientation="horizontal"
     tools:context=".ControllerActivity">
 
+
+
     <!-- Widget to see first person view (FPV) -->
     <dji.ux.widget.FPVWidget
+        android:id="@+id/fpvView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <dji.ux.widget.FPVOverlayWidget
+        android:id="@+id/fpvOverlayView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.amap.api.maps.MapView
+        android:id="@+id/mapView"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <dji.ux.workflow.CompassCalibratingWorkFlow
         android:layout_width="match_parent"
@@ -86,7 +96,7 @@
         android:tint="@color/alert"
         android:layout_below="@id/signal"
         android:background="@drawable/round_btn_pressed"
-        android:layout_marginEnd="6dp"
+        android:layout_marginEnd="24dp"
         android:padding="8dp"
         android:src="@drawable/ic_exit" />
 
@@ -168,6 +178,26 @@
             android:layout_marginRight="12dp"
             tools:ignore="RtlHardcoded" />
 
+        <LinearLayout
+            android:layout_marginStart="8dp"
+            android:id="@+id/bottomActionLayout"
+            android:background="@color/black_half"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:background="@null"
+                android:id="@+id/ibFpvMapLayer"
+                android:padding="12dp"
+                android:layout_gravity="bottom"
+                android:src="@drawable/ic_map_fpv_layer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
+
     </LinearLayout>
 
 
@@ -212,9 +242,39 @@
         android:id="@+id/CameraCapturePanel"
         android:layout_width="50dp"
         android:layout_height="213dp"
+        android:layout_marginEnd="12dp"
         android:layout_below="@id/camera"
         android:layout_alignParentRight="true"
         tools:ignore="RtlHardcoded" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/mapRightActionLayout"
+            android:layout_marginEnd="12dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivLayer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@drawable/round_btn_pressed"
+                android:src="@drawable/ic_layer" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivMyLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="8dp"
+                android:background="@drawable/round_btn_pressed"
+                android:src="@drawable/ic_my_location" />
+
+        </LinearLayout>
 
 
     <dji.ux.panel.CameraSettingExposurePanel
@@ -244,15 +304,6 @@
         android:layout_below="@id/signal"
         android:visibility="gone"
         custom:excludeItem="ESCStatus" />
-
-        <com.dooze.djibox.widgets.FlightLocationView
-            android:id="@+id/flightLocationView"
-            android:layout_below="@id/signal"
-            android:layout_toEndOf="@id/leftActionLayout"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_width="240dp"
-            android:layout_height="240dp"/>
 
 
     <FrameLayout
@@ -324,6 +375,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:background="@color/gray_light" />
+
+            <TextView
+                android:id="@+id/tvFunOfflineMap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="12dp"
+                android:text="@string/fun_offline_map"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/gray_light" />
+
         </LinearLayout>
 
     </ScrollView>

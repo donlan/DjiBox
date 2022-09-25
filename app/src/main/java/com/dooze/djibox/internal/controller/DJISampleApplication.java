@@ -24,7 +24,7 @@ public class DJISampleApplication extends Application {
     private static BaseProduct product;
     private static BluetoothProductConnector bluetoothConnector = null;
     private static Bus bus = new Bus(ThreadEnforcer.ANY);
-    private static Application app = null;
+    private static DJISampleApplication app = null;
 
     /**
      * Gets instance of the specific product connected after the
@@ -63,7 +63,7 @@ public class DJISampleApplication extends Application {
         return (HandHeld) getProductInstance();
     }
 
-    public static Application getInstance() {
+    public static DJISampleApplication getInstance() {
         return DJISampleApplication.app;
     }
 
