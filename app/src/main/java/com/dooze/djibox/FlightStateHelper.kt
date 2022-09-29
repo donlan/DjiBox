@@ -20,6 +20,7 @@ import com.dooze.djibox.utils.MapConvertUtils
 import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
 import pdb.app.base.extensions.showSnack
+import java.text.DecimalFormat
 
 /**
  * @author 梁桂栋
@@ -35,44 +36,15 @@ class FlightStateHelper {
 
     private var mapView: MapView? = null
 
+    private var distanceView:TextView?  = null
+
     private var flightMarker: Marker? = null
 
-    private var debugInfoView: TextView? = null
 
-
-    fun init(mapView: MapView) {
+    fun init(mapView: MapView, distanceView:TextView? = null) {
         this.mapView = mapView
+        this.distanceView = distanceView
         initFlightController()
-    }
-
-    private fun requireDebugInfoView(): TextView? {
-        val context = mapView?.context ?: return null
-        val parent = mapView?.parent as? RelativeLayout ?: return null
-        if (debugInfoView == null) {
-            debugInfoView = TextView(context).apply {
-                setTextColor(Color.WHITE)
-                setBackgroundColor(
-                    ColorUtils.setAlphaComponent(
-                        Color.BLACK,
-                        (0.3 * 255).toInt()
-                    )
-                )
-                parent.addView(
-                    this,
-                    RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        addRule(RelativeLayout.CENTER_IN_PARENT)
-                    })
-            }
-            debugInfoView!!.setOnLongClickListener {
-                it.isVisible = false
-                true
-            }
-        }
-
-        return debugInfoView
     }
 
 
@@ -96,12 +68,6 @@ class FlightStateHelper {
                 val direction = djiFlightControllerCurrentState.aircraftHeadDirection
                 val point = MapConvertUtils.WGS2GCJ(droneLocationLat, droneLocationLng)
                 mapView.post {
-                    mapView.map.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            point,
-                            17f
-                        )
-                    )
 
                     val marker = (flightMarker ?: mapView.map.addMarker(MarkerOptions().apply {
                         position(point)
@@ -114,31 +80,17 @@ class FlightStateHelper {
                         drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
                         this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
                     }))
+                    flightMarker = marker
                     marker.position = point
                     marker.rotateAngle = direction.toFloat()
 
-                    if (BuildConfig.DEBUG && requireDebugInfoView()?.isVisible == true) {
-                        requireDebugInfoView()?.text = buildString {
-                            append("Lat:")
-                            append(droneLocationLat)
-                            append("\n")
-                            append("Lng", droneLocationLng)
-                            append("\n")
-                            append("Time:${djiFlightControllerCurrentState.flightTimeInSeconds}s\n")
-                            mapView.map.myLocation?.let {
-                                append("MyLocation:\n")
-                                append("Lat:${it.latitude}\n")
-                                append("Lng${it.longitude}\n")
-                                append(
-                                    "Distance:${
-                                        AMapUtils.calculateLineDistance(
-                                            it.point,
-                                            point
-                                        )
-                                    }"
-                                )
-                            }
-                        }
+                    val distance = AMapUtils.calculateLineDistance(
+                        marker.position,
+                        point
+                    )
+                    distanceView?.text = buildString {
+                        append(distance.toInt())
+                        append("米")
                     }
                 }
             }

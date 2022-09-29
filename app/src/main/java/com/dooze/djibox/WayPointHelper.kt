@@ -111,7 +111,7 @@ class WayPointHelper : IPickPointMarker {
             activity.getString(R.string.waypoint_start_pick_content)
         ) {
             if (it.id == R.id.commonStart) {
-                mapView.isVisible = true
+                activity.changeMapViewMode(true)
                 isInConfig = true
             }
         }.addActions(AppAlert.cancelAction(activity), AppAlert.startAction(activity)).show()

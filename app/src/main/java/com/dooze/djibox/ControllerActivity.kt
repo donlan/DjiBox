@@ -143,7 +143,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
             true
         }
 
-        flightStateHelper.init(binding.mapView)
+        flightStateHelper.init(binding.mapView, binding.tvDistance)
         hotPointHelper.init(binding.mapView, this)
         wayPointHelper.init(binding.mapView, this)
     }
@@ -188,9 +188,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 showFragment(MediaManagerFragment())
             }
             R.id.ibFpvMapLayer -> {
-                binding.mapView.isVisible = !binding.mapView.isVisible
-                binding.mapRightActionLayout.isVisible = binding.mapView.isVisible
-                binding.CameraCapturePanel.isVisible = !binding.mapView.isVisible
+                changeMapViewMode(!binding.mapView.isVisible)
             }
             R.id.ivMyLocation -> {
                 locationClient?.lastKnownLocation?.let {
@@ -223,6 +221,12 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 startActivity(Intent(this, OfflineMapActivity::class.java))
             }
         }
+    }
+
+    fun changeMapViewMode(showMap:Boolean) {
+        binding.mapView.isVisible = showMap
+        binding.mapRightActionLayout.isVisible = binding.mapView.isVisible
+        binding.CameraCapturePanel.isVisible = !binding.mapView.isVisible
     }
 
 
