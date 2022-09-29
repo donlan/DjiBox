@@ -448,5 +448,6 @@
     <string name="fun_map_layer">地图图层类型</string>
     <string name="waypoint_start_pick_content">在地图上多次长按选取不同的点进行航点任务配置，单击地图上的点可单独配置,长按列表中的点可以删除已选择的点</string>
     <string name="waypoint_start_task_upload">开始上传任务配置</string>
+    <string name="unknown">unknown</string>
 
 </resources>

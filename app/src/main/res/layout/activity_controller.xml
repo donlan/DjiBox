@@ -165,6 +165,7 @@
         android:background="@color/transparent" />
 
     <LinearLayout
+        android:id="@+id/dashLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -196,10 +197,22 @@
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 
-
-
     </LinearLayout>
 
+
+    <TextView
+        android:id="@+id/tvDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="6dp"
+        android:paddingVertical="2dp"
+        android:text="@string/unknown"
+        android:layout_marginStart="100dp"
+        android:layout_marginBottom="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/black_half"
+        android:textColor="@color/textColorPrimaryLight"
+        android:textSize="12sp" />
 
     <!--Take off and return home buttons on left -->
     <LinearLayout
@@ -304,6 +317,8 @@
         android:layout_below="@id/signal"
         android:visibility="gone"
         custom:excludeItem="ESCStatus" />
+
+
 
 
     <FrameLayout

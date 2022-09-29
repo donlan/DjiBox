@@ -63,7 +63,7 @@ class HotPointHelper : IPickPointMarker {
             activity.getString(R.string.hotpoint_start_pick_content)
         ) {
             if (it.id == R.id.commonStart) {
-                mapView.isVisible = true
+                activity.changeMapViewMode(true)
                 isStartedPick = true
             }
         }.addActions(AppAlert.cancelAction(activity), AppAlert.startAction(activity)).show()
