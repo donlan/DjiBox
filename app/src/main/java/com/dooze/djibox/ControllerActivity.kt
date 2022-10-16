@@ -158,22 +158,22 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                         Log.d(MainContent.TAG, "onProductDisconnect")
                     }
 
-                    override fun onProductConnect(baseProduct: BaseProduct) {
+                    override fun onProductConnect(baseProduct: BaseProduct?) {
                         Log.d(
                             MainContent.TAG,
                             String.format("onProductConnect newProduct:%s", baseProduct)
                         )
                     }
 
-                    override fun onProductChanged(baseProduct: BaseProduct) {
+                    override fun onProductChanged(baseProduct: BaseProduct?) {
                     }
 
                     override fun onComponentChange(
-                        componentKey: ComponentKey,
-                        oldComponent: BaseComponent,
-                        newComponent: BaseComponent
+                        componentKey: ComponentKey?,
+                        oldComponent: BaseComponent?,
+                        newComponent: BaseComponent?
                     ) {
-                        newComponent.setComponentListener(mDJIComponentListener)
+                        newComponent?.setComponentListener(mDJIComponentListener)
                         Log.d(
                             MainContent.TAG, String.format(
                                 "onComponentChange key:%s, oldComponent:%s, newComponent:%s",
