@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.view.updatePadding
 import com.dooze.djibox.R
 import pdb.app.base.extensions.*
 
@@ -77,6 +78,7 @@ class ActionView @JvmOverloads constructor(
             content,
             0,
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                minimumHeight = 40.dpInt(context)
                 addRule(START_OF, close.takeIf { it.parent != null }?.id ?: R.id.commonOk)
             })
     }
@@ -95,5 +97,34 @@ class ActionView @JvmOverloads constructor(
                 bottomMargin = 20.dpInt(context)
             }
         )
+    }
+}
+
+
+fun SeekBarAction(
+    context: Context,
+    min: Int,
+    max: Int,
+    title:String,
+    step: Float = 1f,
+    onProgressChanged: ((progress: Float) -> Unit)? = null,
+    onOkClick: (() -> Unit)? = null
+): ActionView {
+    return ActionView(context).apply {
+        wrap(SeekbarText(context).apply {
+            this.progress
+            setTitle(title)
+            updatePadding(16.dpInt(context), 16.dpInt(context))
+            progress = 50f
+            this.onProgressChanged = { radius ->
+                setValuesText(radius.toString())
+                onProgressChanged?.invoke(radius)
+            }
+            setup(min, max, step)
+        })
+        this.onOkClick = {
+            removeFromParent()
+            onOkClick?.invoke()
+        }
     }
 }

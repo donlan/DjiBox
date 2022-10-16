@@ -7,15 +7,18 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps.AMap
@@ -26,10 +29,22 @@ import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.dooze.djibox.databinding.ActivityControllerBinding
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
-import com.dooze.djibox.map.IPickPointMarker
+import com.dooze.djibox.internal.utils.ToastUtils
+import com.dooze.djibox.internal.view.MainContent
 import com.dooze.djibox.map.PickLocationActivity
 import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
+import dji.common.error.DJIError
+import dji.common.error.DJISDKError
+import dji.log.DJILog
+import dji.sdk.base.BaseComponent
+import dji.sdk.base.BaseProduct
+import dji.sdk.base.BaseProduct.ComponentKey
+import dji.sdk.sdkmanager.DJISDKInitEvent
+import dji.sdk.sdkmanager.DJISDKManager
+import dji.sdk.sdkmanager.DJISDKManager.SDKManagerCallback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pdb.app.base.extensions.roundedCorner
 
 /**
@@ -48,6 +63,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     private val flightStateHelper = FlightStateHelper()
     private val hotPointHelper = HotPointHelper()
     private val wayPointHelper = WayPointHelper()
+    private val groundMissionHelper = GroundMissionHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,12 +72,33 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(
                 this, arrayOf<String>(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.CAMERA,
-                    Manifest.permission.ACCESS_WIFI_STATE,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_PHONE_STATE
+                    Manifest.permission.VIBRATE, // Gimbal rotation
+                    // Gimbal rotation
+                    Manifest.permission.INTERNET, // API requests
+                    // API requests
+                    Manifest.permission.ACCESS_WIFI_STATE, // WIFI connected products
+                    // WIFI connected products
+                    Manifest.permission.ACCESS_COARSE_LOCATION, // Maps
+                    // Maps
+                    Manifest.permission.ACCESS_NETWORK_STATE, // WIFI connected products
+                    // WIFI connected products
+                    Manifest.permission.ACCESS_FINE_LOCATION, // Maps
+                    // Maps
+                    Manifest.permission.CHANGE_WIFI_STATE, // Changing between WIFI and USB connection
+                    // Changing between WIFI and USB connection
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE, // Log files
+                    // Log files
+                    Manifest.permission.BLUETOOTH, // Bluetooth connected products
+                    // Bluetooth connected products
+                    Manifest.permission.BLUETOOTH_ADMIN, // Bluetooth connected products
+                    // Bluetooth connected products
+                    Manifest.permission.READ_EXTERNAL_STORAGE, // Log files
+                    // Log files
+                    Manifest.permission.READ_PHONE_STATE, // Device UUID accessed upon registration
+                    // Device UUID accessed upon registration
+                    Manifest.permission.RECORD_AUDIO // Speaker accessory
+                    // Speaker accessory
                 ), 1
             )
         } else {
@@ -81,7 +118,11 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.bottomActionLayout.roundedCorner(4)
         binding.ivLayer.setOnClickListener(this)
         binding.ivMyLocation.setOnClickListener(this)
-        WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
+        binding.tvFunGroundMission.setOnClickListener(this)
+        WindowInsetsControllerCompat(
+            window,
+            window.decorView
+        ).hide(WindowInsetsCompat.Type.statusBars())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -89,7 +130,83 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.mapView.onSaveInstanceState(outState)
     }
 
+    private fun initSDK() {
+        val mDJIComponentListener = BaseComponent.ComponentListener { isConnected ->
+            Log.d(MainContent.TAG, "onComponentConnectivityChanged: $isConnected")
+        }
+        lifecycleScope.launch(Dispatchers.Default) {
+            DJISDKManager.getInstance()
+                .registerApp(applicationContext, object : SDKManagerCallback {
+                    override fun onRegister(djiError: DJIError) {
+                        if (djiError === DJISDKError.REGISTRATION_SUCCESS) {
+                            DJILog.e(
+                                "App registration",
+                                DJISDKError.REGISTRATION_SUCCESS.description
+                            )
+                            DJISDKManager.getInstance().startConnectionToProduct()
+                            ToastUtils.setResultToToast(getString(R.string.sdk_registration_success_message))
+                        } else {
+                            ToastUtils.setResultToToast(
+                                getString(R.string.sdk_registration_message)
+                                    .toString() + djiError.description
+                            )
+                        }
+                        Log.v(MainContent.TAG, djiError.description)
+                    }
+
+                    override fun onProductDisconnect() {
+                        Log.d(MainContent.TAG, "onProductDisconnect")
+                    }
+
+                    override fun onProductConnect(baseProduct: BaseProduct) {
+                        Log.d(
+                            MainContent.TAG,
+                            String.format("onProductConnect newProduct:%s", baseProduct)
+                        )
+                    }
+
+                    override fun onProductChanged(baseProduct: BaseProduct) {
+                    }
+
+                    override fun onComponentChange(
+                        componentKey: ComponentKey,
+                        oldComponent: BaseComponent,
+                        newComponent: BaseComponent
+                    ) {
+                        newComponent.setComponentListener(mDJIComponentListener)
+                        Log.d(
+                            MainContent.TAG, String.format(
+                                "onComponentChange key:%s, oldComponent:%s, newComponent:%s",
+                                componentKey,
+                                oldComponent,
+                                newComponent
+                            )
+                        )
+                    }
+
+                    override fun onInitProcess(djisdkInitEvent: DJISDKInitEvent, i: Int) {}
+                    override fun onDatabaseDownloadProgress(current: Long, total: Long) {
+//                    val process = (100 * current / total).toInt()
+//                    if (process == lastProcess) {
+//                        return
+//                    }
+//                    lastProcess = process
+//                    showProgress(process)
+//                    if (process % 25 == 0) {
+//                        ToastUtils.setResultToToast("DB load process : $process")
+//                    } else if (process == 0) {
+//                        ToastUtils.setResultToToast("DB load begin")
+//                    }
+                    }
+                })
+        }
+    }
+
+    val contentRoot: RelativeLayout
+        get() = binding.rootLayout
+
     private fun init(savedInstanceState: Bundle?) {
+        initSDK()
         binding.ivExit.setOnClickListener {
             finish()
         }
@@ -130,11 +247,12 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         locationClient.startLocation()
 
 
-        val pickMarkers = listOf<IPickPointMarker>(hotPointHelper, wayPointHelper)
+        val pickMarkers = listOf(hotPointHelper, wayPointHelper, groundMissionHelper)
 
         mapView.map.setOnMapLongClickListener { point ->
-            mapView.zoomTo(mapView.map.myLocation?.point ?: return@setOnMapLongClickListener)
-            pickMarkers.first { it.onPickPoint(point) }
+            if (pickMarkers.firstOrNull { it.onPickPoint(point) } == null) {
+                mapView.zoomTo(mapView.map.myLocation?.point ?: return@setOnMapLongClickListener)
+            }
             makeVibrate()
         }
 
@@ -146,16 +264,17 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         flightStateHelper.init(binding.mapView, binding.tvDistance)
         hotPointHelper.init(binding.mapView, this)
         wayPointHelper.init(binding.mapView, this)
+        groundMissionHelper.init(binding.mapView, this)
     }
 
     override fun onResume() {
         super.onResume()
-       binding.mapView.onResume()
+        binding.mapView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-       binding.mapView.onPause()
+        binding.mapView.onPause()
     }
 
     override fun onDestroy() {
@@ -187,6 +306,10 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 binding.rootDrawer.closeDrawer(Gravity.LEFT)
                 showFragment(MediaManagerFragment())
             }
+            R.id.tvFunGroundMission -> {
+                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                groundMissionHelper.markStartWapPoint()
+            }
             R.id.ibFpvMapLayer -> {
                 changeMapViewMode(!binding.mapView.isVisible)
             }
@@ -211,7 +334,9 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                             }
                         }
                         binding.mapView.map.mapType = type
-                        WindowInsetsControllerCompat(window, window.decorView).hide(WindowInsetsCompat.Type.statusBars())
+                        WindowInsetsControllerCompat(window, window.decorView).hide(
+                            WindowInsetsCompat.Type.statusBars()
+                        )
                         true
                     }
                 }.show()
@@ -223,7 +348,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun changeMapViewMode(showMap:Boolean) {
+    fun changeMapViewMode(showMap: Boolean) {
         binding.mapView.isVisible = showMap
         binding.mapRightActionLayout.isVisible = binding.mapView.isVisible
         binding.CameraCapturePanel.isVisible = !binding.mapView.isVisible
