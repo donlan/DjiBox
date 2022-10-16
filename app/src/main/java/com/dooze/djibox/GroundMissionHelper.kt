@@ -121,7 +121,7 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
 
             val len = min(groundWidth, groundHeight) / 2
             val circle = addCircle(context, markers.first().position, 0.0)
-            SeekBarAction(activity, 20, len.coerceAtLeast(20).coerceAtMost(500),
+            SeekBarAction(activity, 5, len.coerceAtLeast(6).coerceAtMost(500),
                 context.getString(R.string.fun_ground_mission_set_radius_title),
                 onProgressChanged = {
                     circle.center = createPoint(it.toInt(), -it.toInt())
