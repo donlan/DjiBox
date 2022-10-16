@@ -20,4 +20,8 @@
     <color name="content_bg">#FFF</color>
     <color name="map_radius_fill">#4D15BD1C</color>
     <color name="map_radius_stoker">#15BD1C</color>
+
+
+    <color name="map_highlight_radius_fill">#4DFF9800</color>
+    <color name="map_highlight_radius_stoker">#FF9800</color>
 </resources>

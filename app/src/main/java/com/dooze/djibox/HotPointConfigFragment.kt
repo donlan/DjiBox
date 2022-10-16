@@ -9,7 +9,6 @@ import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
 import com.dooze.djibox.extensions.lazyFast
 import com.dooze.djibox.extensions.showSnack
 import com.dooze.djibox.internal.controller.DJISampleApplication
-import com.dooze.djibox.utils.toDJILocation
 import dji.common.error.DJIError
 import dji.common.mission.hotpoint.HotpointHeading
 import dji.common.mission.hotpoint.HotpointMission
@@ -40,13 +39,17 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     private val point: LatLng by lazyFast { requireArguments().getParcelable("point")!! }
     private val radius by lazyFast { requireArguments().getDouble("radius") }
 
+    var configReceiver: ((mission: HotpointMission) -> Unit)? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.ivClose.roundedCorner(-1)
         binding.ivClose.setOnClickListener(this)
         binding.ibDone.setOnClickListener(this)
-
+        requireArguments().getString("title")?.let {
+            binding.tvHint.text = it
+        }
         updateSpeedProgress()
         binding.speedSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -85,7 +88,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
             R.id.ibDone -> {
 
                 val mission = HotpointMission().apply {
-                    this.hotpoint = point.toDJILocation()
+                    this.hotpoint = LocationCoordinate2D(point.latitude, point.longitude)
                     this.radius = this@HotPointConfigFragment.radius
                     this.altitude = binding.etAltitude.text.toString().toDoubleOrNull() ?: 0.0
                     this.heading = when (binding.rgHeading.checkedRadioButtonId) {
@@ -116,18 +119,25 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     )
                     return
                 }
+                if (configReceiver != null) {
+                    configReceiver?.invoke(mission)
+                    dismiss()
+                    return
+                }
                 val operator = hotPointOperator
                     ?: DJISDKManager.getInstance().missionControl.hotpointMissionOperator.also {
                         hotPointOperator = it
                         it.addListener(this)
                     }
                 operator.startMission(mission) {
-                    binding.root.showSnack(
-                        getString(
-                            R.string.hot_pooint_start_mission_error,
-                            "${it.description}(${it.errorCode})"
+                    if (it != null) {
+                        binding.root.showSnack(
+                            getString(
+                                R.string.hot_pooint_start_mission_error,
+                                "${it.description}(${it.errorCode})"
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
@@ -169,11 +179,18 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
 
 
     companion object {
-        fun newInstance(point: LatLng, radius: Double): HotPointConfigFragment {
+        fun newInstance(
+            point: LatLng,
+            radius: Double,
+            title: String? = null,
+            configReceiver: ((mission: HotpointMission) -> Unit)? = null
+        ): HotPointConfigFragment {
             val fragment = HotPointConfigFragment()
+            fragment.configReceiver = configReceiver
             fragment.arguments = Bundle().apply {
                 putParcelable("point", point)
                 putDouble("radius", radius)
+                putString("title", title)
             }
             return fragment
         }

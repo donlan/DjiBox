@@ -81,13 +81,12 @@
             This is necessary for product when connecting over USB. -->
 
         <activity
-            android:name="com.dooze.djibox.internal.controller.MainActivity"
+            android:name=".ControllerActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
-            android:label="@string/sample_app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -118,11 +117,11 @@
 
         <activity android:name=".fun.utmiss.UTMISSActivity" />
 
-        <activity
-            android:name=".ControllerActivity"
-            android:exported="false"
-            android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.NoActionBar" />
+<!--        <activity-->
+<!--            android:name=".ControllerActivity"-->
+<!--            android:exported="false"-->
+<!--            android:screenOrientation="landscape"-->
+<!--            android:theme="@style/AppTheme.NoActionBar" />-->
 
         <activity
             android:name=".WapPointActivity"

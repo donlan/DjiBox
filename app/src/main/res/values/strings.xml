@@ -449,5 +449,10 @@
     <string name="waypoint_start_pick_content">在地图上多次长按选取不同的点进行航点任务配置，单击地图上的点可单独配置,长按列表中的点可以删除已选择的点</string>
     <string name="waypoint_start_task_upload">开始上传任务配置</string>
     <string name="unknown">unknown</string>
+    <string name="ground_mission_start_pick_content">在地图上长按选中两个点(先选左上角后选右下角)后自动补齐成一个矩形区域，设置环绕飞行半径后自动生产环绕路线。</string>
+    <string name="fun_ground_mission">区域坏绕飞行</string>
+    <string name="fun_ground_mission_set_radius_title">环绕飞行时单个飞行圆半径</string>
+    <string name="fun_ground_mission_config_title">配置每个环绕点飞行</string>
+    <string name="fun_groundMission_point_count_hint">本次环绕飞行共 %1$d 个环绕点。</string>
 
 </resources>

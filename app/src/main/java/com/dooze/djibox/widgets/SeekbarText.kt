@@ -75,6 +75,7 @@ class SeekbarText @JvmOverloads constructor(
         this.max = max
         this.step = step
         binding.speedSeekBar.max = ((max - min) / step).toInt()
+        onProgressChanged?.invoke(progress)
     }
 
 
