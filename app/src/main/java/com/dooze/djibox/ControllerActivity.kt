@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
@@ -34,6 +35,7 @@ import com.dooze.djibox.internal.view.MainContent
 import com.dooze.djibox.map.PickLocationActivity
 import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
+import com.dooze.djibox.widgets.GimbalAdjustView
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
 import dji.log.DJILog
@@ -64,6 +66,8 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     private val hotPointHelper = HotPointHelper()
     private val wayPointHelper = WayPointHelper()
     private val groundMissionHelper = GroundMissionHelper()
+
+    private var gimbalAdjustView: GimbalAdjustView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,6 +122,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.bottomActionLayout.roundedCorner(4)
         binding.ivLayer.setOnClickListener(this)
         binding.ivMyLocation.setOnClickListener(this)
+        binding.tvFunGimbalAdjust.setOnClickListener(this)
         binding.tvFunGroundMission.setOnClickListener(this)
         WindowInsetsControllerCompat(
             window,
@@ -285,15 +290,19 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         locationClient = null
     }
 
+    private fun closeDrawer() {
+        binding.rootDrawer.closeDrawer(Gravity.LEFT)
+    }
+
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.tvFunHotPoint -> {
-                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                closeDrawer()
                 //pickLocation.launch(0)
                 hotPointHelper.markStartHotPoint(this)
             }
             R.id.tvFunWayPoint -> {
-                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                closeDrawer()
 //                startActivity(
 //                    Intent(
 //                        this@ControllerActivity,
@@ -303,12 +312,16 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 wayPointHelper.markStartWapPoint()
             }
             R.id.tvFunMediaManager -> {
-                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                closeDrawer()
                 showFragment(MediaManagerFragment())
             }
             R.id.tvFunGroundMission -> {
-                binding.rootDrawer.closeDrawer(Gravity.LEFT)
+                closeDrawer()
                 groundMissionHelper.markStartWapPoint()
+            }
+            R.id.tvFunGimbalAdjust -> {
+                closeDrawer()
+                showGimbalAdjust()
             }
             R.id.ibFpvMapLayer -> {
                 changeMapViewMode(!binding.mapView.isVisible)
@@ -352,6 +365,21 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.mapView.isVisible = showMap
         binding.mapRightActionLayout.isVisible = binding.mapView.isVisible
         binding.CameraCapturePanel.isVisible = !binding.mapView.isVisible
+        binding.camera.isVisible = !binding.mapView.isVisible
+    }
+
+    private fun showGimbalAdjust() {
+        val gimbalAdjustView = gimbalAdjustView ?: GimbalAdjustView(this).also {
+            gimbalAdjustView = it
+        }
+        binding.fragmentContainer.addView(
+            gimbalAdjustView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        )
+        gimbalAdjustView.attach()
     }
 
 

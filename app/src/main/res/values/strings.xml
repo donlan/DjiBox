@@ -454,5 +454,6 @@
     <string name="fun_ground_mission_set_radius_title">环绕飞行时单个飞行圆半径</string>
     <string name="fun_ground_mission_config_title">配置每个环绕点飞行</string>
     <string name="fun_groundMission_point_count_hint">本次环绕飞行共 %1$d 个环绕点。</string>
+    <string name="fun_gimbal_adjust">摄像头角度调整</string>
 
 </resources>

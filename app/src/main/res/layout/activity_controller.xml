@@ -421,6 +421,21 @@
                 android:layout_height="1px"
                 android:background="@color/gray_light" />
 
+            <TextView
+                android:id="@+id/tvFunGimbalAdjust"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="12dp"
+                android:text="@string/fun_gimbal_adjust"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="16sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/gray_light" />
+
         </LinearLayout>
 
     </ScrollView>
