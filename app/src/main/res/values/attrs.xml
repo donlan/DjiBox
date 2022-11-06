@@ -14,4 +14,11 @@
         <attr name="sbtProgress" format="integer"/>
         <attr name="sbtStep" format="float"/>
     </declare-styleable>
+
+    <declare-styleable name="Switcher">
+        <attr name="thumbWidth" format="dimension" />
+        <attr name="thumbColor" format="color" />
+        <attr name="checkedTrackColor" format="color" />
+        <attr name="uncheckedTrackColor" format="color" />
+    </declare-styleable>
 </resources>

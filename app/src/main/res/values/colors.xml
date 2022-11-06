@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimaryDisable">#5C6578</color>
     <color name="colorPrimary">#314268</color>
+    <color name="colorPrimaryDisableBg">#4D314268</color>
     <color name="colorPrimaryDark">#273B67</color>
     <color name="colorAccent">#314268</color>
     <color name="title_dark">#212121</color>

@@ -87,6 +87,8 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
         if (markers.size >= 2) {
             markers.onEach { it.remove() }
             markers.clear()
+            currentGroupPolygon?.remove()
+            currentText?.remove()
             circles.onEach { it.remove() }
             circles.clear()
         }
@@ -121,13 +123,13 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
 
             val len = min(groundWidth, groundHeight) / 2
             val circle = addCircle(context, markers.first().position, 0.0)
+            circles.add(circle)
             SeekBarAction(activity, 5, len.coerceAtLeast(6).coerceAtMost(500),
                 context.getString(R.string.fun_ground_mission_set_radius_title),
                 onProgressChanged = {
                     circle.center = createPoint(it.toInt(), -it.toInt())
                     circle.radius = it.toDouble()
                 }, onOkClick = {
-                    circles.add(circle)
                     autoFillCircles()
                 }).attachBottom(activity.contentRoot)
         }
@@ -145,6 +147,7 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
         val h = MapUtils.verticalDistance(start, end)
         val col = ceil(w / (startCircle.radius * 2 * diff)).toInt()
         val row = ceil(h / (startCircle.radius * 2 * diff)).toInt()
+        circles.onEach { it.remove() }
         circles.clear()
         val baseOffset = (startCircle.radius * 2 * diff).toInt()
         val hAdditional = (row * baseOffset - h)
