@@ -12,11 +12,14 @@ import com.amap.api.maps.AMapUtils
 import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.MapView
 import com.amap.api.maps.model.BitmapDescriptorFactory
+import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.Marker
 import com.amap.api.maps.model.MarkerOptions
+import com.dooze.djibox.extensions.mapTo
 import com.dooze.djibox.internal.controller.DJISampleApplication
 import com.dooze.djibox.map.point
 import com.dooze.djibox.utils.MapConvertUtils
+import dji.common.flightcontroller.RTKState
 import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
 import pdb.app.base.extensions.showSnack
@@ -36,15 +39,68 @@ class FlightStateHelper {
 
     private var mapView: MapView? = null
 
-    private var distanceView:TextView?  = null
+    private var distanceView: TextView? = null
 
     private var flightMarker: Marker? = null
 
+    var rtkState: RTKState? = null
+        set(value) {
+            field = value
+            value?.run {
+                updateUIState(
+                    fusionMobileStationLocation.latitude,
+                    fusionMobileStationLocation.longitude,
+                    homePointLocation?.mapTo {
+                        MapConvertUtils.WGS2GCJ(this.latitude, this.longitude)
+                    },
+                    heading
+                )
+            }
+        }
 
-    fun init(mapView: MapView, distanceView:TextView? = null) {
+
+    fun init(mapView: MapView, distanceView: TextView? = null) {
         this.mapView = mapView
         this.distanceView = distanceView
         initFlightController()
+    }
+
+
+    private fun updateUIState(
+        aircraftLat: Double, aircraftLng: Double,
+        selfPoint: LatLng?,
+        direction: Float
+    ) {
+        val mapView = mapView ?: return
+        val context = mapView.context
+        val point = MapConvertUtils.WGS2GCJ(aircraftLat, aircraftLng)
+        mapView.post {
+            val marker = (flightMarker ?: mapView.map.addMarker(MarkerOptions().apply {
+                position(point)
+
+                val drawable = ResourcesCompat.getDrawable(
+                    context.resources,
+                    R.drawable.ic_flight,
+                    null
+                )!!.mutate()
+                drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
+                this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
+            }))
+            flightMarker = marker
+            marker.position = point
+            marker.rotateAngle = direction
+
+            selfPoint?.let {
+                val distance = AMapUtils.calculateLineDistance(
+                    selfPoint,
+                    point
+                )
+                distanceView?.text = buildString {
+                    append(distance.toInt())
+                    append("米")
+                }
+            }
+        }
     }
 
 
@@ -63,36 +119,16 @@ class FlightStateHelper {
         }
         if (flightController != null) {
             flightController?.setStateCallback { djiFlightControllerCurrentState ->
+
+                if (rtkState != null) return@setStateCallback
+
                 val droneLocationLat = djiFlightControllerCurrentState.aircraftLocation.latitude
                 val droneLocationLng = djiFlightControllerCurrentState.aircraftLocation.longitude
                 val direction = djiFlightControllerCurrentState.aircraftHeadDirection
-                val point = MapConvertUtils.WGS2GCJ(droneLocationLat, droneLocationLng)
-                mapView.post {
-
-                    val marker = (flightMarker ?: mapView.map.addMarker(MarkerOptions().apply {
-                        position(point)
-
-                        val drawable = ResourcesCompat.getDrawable(
-                            context.resources,
-                            R.drawable.ic_flight,
-                            null
-                        )!!.mutate()
-                        drawable.setTint(ContextCompat.getColor(context, dji.ux.R.color.debug_1))
-                        this.icon(BitmapDescriptorFactory.fromBitmap(drawable.toBitmap()))
-                    }))
-                    flightMarker = marker
-                    marker.position = point
-                    marker.rotateAngle = direction.toFloat()
-
-                    val distance = AMapUtils.calculateLineDistance(
-                        marker.position,
-                        point
-                    )
-                    distanceView?.text = buildString {
-                        append(distance.toInt())
-                        append("米")
-                    }
-                }
+                updateUIState(
+                    droneLocationLat, droneLocationLng,
+                    mapView.map.myLocation.point, direction.toFloat()
+                )
             }
         } else {
             mapView.showSnack(context.getString(R.string.flight_not_connected))

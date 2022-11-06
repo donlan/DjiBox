@@ -66,6 +66,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     private val hotPointHelper = HotPointHelper()
     private val wayPointHelper = WayPointHelper()
     private val groundMissionHelper = GroundMissionHelper()
+    private val rtkHelper = RTKHelper()
 
     private var gimbalAdjustView: GimbalAdjustView? = null
 
@@ -124,6 +125,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.ivMyLocation.setOnClickListener(this)
         binding.tvFunGimbalAdjust.setOnClickListener(this)
         binding.tvFunGroundMission.setOnClickListener(this)
+        binding.rtkSwitcher.setOnClickListener(this)
         WindowInsetsControllerCompat(
             window,
             window.decorView
@@ -168,6 +170,13 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                             MainContent.TAG,
                             String.format("onProductConnect newProduct:%s", baseProduct)
                         )
+                        launch {
+                            kotlin.runCatching {
+                                rtkHelper.start()
+                            }.exceptionOrNull()?.let {
+                                showSnack(it.message ?: return@let)
+                            }
+                        }
                     }
 
                     override fun onProductChanged(baseProduct: BaseProduct?) {
@@ -204,6 +213,11 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 //                    }
                     }
                 })
+        }
+
+        rtkHelper.rtkState.observe(this) { rtkState ->
+            rtkState ?: return@observe
+            flightStateHelper.rtkState = rtkState
         }
     }
 
@@ -256,7 +270,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
         mapView.map.setOnMapLongClickListener { point ->
             if (pickMarkers.firstOrNull { it.onPickPoint(point) } == null) {
-                mapView.zoomTo(mapView.map.myLocation?.point ?: return@setOnMapLongClickListener)
+                //mapView.zoomTo(mapView.map.myLocation?.point ?: return@setOnMapLongClickListener)
             }
             makeVibrate()
         }
@@ -358,6 +372,24 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 binding.rootDrawer.closeDrawer(Gravity.LEFT)
                 startActivity(Intent(this, OfflineMapActivity::class.java))
             }
+            R.id.rtkSwitcher -> {
+                binding.rtkSwitcher.toggleChecked()
+                if (binding.rtkSwitcher.isChecked) {
+                    lifecycleScope.launch {
+                        kotlin.runCatching {
+                            rtkHelper.start()
+                        }.exceptionOrNull()?.let {
+                            showSnack(it.message ?: return@let)
+                        }
+                    }
+                    if (!rtkHelper.attachCallback()) {
+                        showSnack(getString(R.string.fun_rtk_not_avaliable))
+                    }
+                } else {
+                    rtkHelper.detachCallback()
+                    flightStateHelper.rtkState = null
+                }
+            }
         }
     }
 
@@ -381,28 +413,6 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         )
         gimbalAdjustView.attach()
     }
-
-
-    private val pickLocation =
-        registerForActivityResult(object : ActivityResultContract<Int, Pair<LatLng, Double?>?>() {
-            override fun createIntent(context: Context, input: Int): Intent {
-                return Intent(context, PickLocationActivity::class.java)
-            }
-
-            override fun parseResult(resultCode: Int, intent: Intent?): Pair<LatLng, Double?>? {
-                val point: LatLng = intent?.extras?.getParcelable("Location") ?: return null
-                val radius = intent.extras?.getDouble("Radius")
-                return Pair(point, radius)
-            }
-
-        }) {
-            val (point, radius) = it ?: return@registerForActivityResult
-            if (radius == null) {
-                showSnack(getString(R.string.hot_point_need_set_radius_alert))
-                return@registerForActivityResult
-            }
-            showFragment(HotPointConfigFragment.newInstance(point, radius))
-        }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
