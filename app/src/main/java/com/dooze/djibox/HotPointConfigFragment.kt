@@ -14,9 +14,12 @@ import dji.common.mission.hotpoint.HotpointHeading
 import dji.common.mission.hotpoint.HotpointMission
 import dji.common.mission.hotpoint.HotpointMissionEvent
 import dji.common.mission.hotpoint.HotpointStartPoint
+import dji.common.mission.intelligenthotpoint.IntelligentHotpointMission
+import dji.common.mission.intelligenthotpoint.IntelligentHotpointMissionEvent
 import dji.common.model.LocationCoordinate2D
 import dji.sdk.mission.hotpoint.HotpointMissionOperator
 import dji.sdk.mission.hotpoint.HotpointMissionOperatorListener
+import dji.sdk.mission.intelligenthotpoint.IntelligentHotpointMissionOperatorListener
 import dji.sdk.sdkmanager.DJISDKManager
 import pdb.app.base.extensions.roundedCorner
 
@@ -117,6 +120,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                             "${error.description}(${error.errorCode})"
                         )
                     )
+                    fallback(mission)
                     return
                 }
                 if (configReceiver != null) {
@@ -137,9 +141,66 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                                 "${it.description}(${it.errorCode})"
                             )
                         )
+                        fallback(mission)
                     }
                 }
             }
+        }
+    }
+
+    private fun fallback(mission: HotpointMission) {
+        requireActivity().showSnack(
+            getString(R.string.hot_pooint_fallback_to_intelligent)
+        )
+        val newMission = IntelligentHotpointMission().apply {
+            hotpoint = mission.hotpoint
+            radius = mission.radius.toFloat()
+            altitude = mission.altitude.toFloat()
+            angularVelocity = mission.angularVelocity
+        }
+        val error = newMission.checkParameters()
+        if (error != null) {
+            requireActivity().showSnack(
+                getString(
+                    R.string.hot_pooint_config_error,
+                    "Fallback:${error.description}(${error.errorCode})"
+                )
+            )
+            return
+        }
+        DJISDKManager.getInstance().missionControl.intelligentHotpointMissionOperator.apply {
+            addListener(object : IntelligentHotpointMissionOperatorListener {
+                override fun onExecutionUpdate(p0: IntelligentHotpointMissionEvent) {
+                    binding.root.showSnack(
+                        getString(
+                            R.string.hot_pooint_execution_update,
+                            "state = ${p0.currentState}"
+                        )
+                    )
+                }
+
+                override fun onExecutionStart() {
+                    binding.root.showSnack(getString(R.string.hot_pooint_execution_start))
+                }
+
+                override fun onExecutionFinish(p0: DJIError?) {
+                    if (p0 == null) {
+                        binding.root.showSnack(
+                            getString(
+                                R.string.hot_pooint_execution_finsish_success
+                            )
+                        )
+                    } else {
+                        binding.root.showSnack(
+                            getString(
+                                R.string.hot_pooint_execution_error,
+                                "${p0.description}(${p0.errorCode})"
+                            )
+                        )
+                    }
+                }
+
+            })
         }
     }
 
