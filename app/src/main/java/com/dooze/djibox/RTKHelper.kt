@@ -31,7 +31,7 @@ class RTKHelper {
     val rtkState: LiveData<RTKState?> = _rtkState
 
     private val rtkStateCallback = RTKState.Callback {
-        _rtkState.value = it
+        _rtkState.postValue(it)
     }
 
     fun init() {
@@ -53,7 +53,7 @@ class RTKHelper {
         if (ModuleVerificationUtil.isRTKAvailable() && rtk != null) {
             rtk!!.setStateCallback(null)
         }
-        _rtkState.value = null
+        _rtkState.postValue(null)
     }
 
 
