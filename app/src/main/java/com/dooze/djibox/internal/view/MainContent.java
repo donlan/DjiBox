@@ -172,8 +172,7 @@ public class MainContent extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 //isregisterForLDM = true;
-                //checkAndRequestPermissions();
-                mContext.startActivity(new Intent(mContext, ControllerActivity.class));
+                checkAndRequestPermissions();
             }
         });
         mBtnOpen.setOnClickListener(new OnClickListener() {
@@ -182,8 +181,7 @@ public class MainContent extends RelativeLayout {
                 if (GeneralUtils.isFastDoubleClick()) {
                     return;
                 }
-                // DJISampleApplication.getEventBus().post(componentList);
-                mContext.startActivity(new Intent(mContext, ControllerActivity.class));
+                 DJISampleApplication.getEventBus().post(componentList);
             }
         });
         mBtnBluetooth.setOnClickListener(new OnClickListener() {
