@@ -63,6 +63,10 @@
                 android:resource="@xml/accessory_filter" />
         </activity>
 
+        <activity
+            android:name=".internal.controller.MainActivity"
+            android:exported="false" />
+
         <!-- DJI SDK -->
         <!--
             ADD API_KEY HERE and make sure you
@@ -117,11 +121,11 @@
 
         <activity android:name=".fun.utmiss.UTMISSActivity" />
 
-<!--        <activity-->
-<!--            android:name=".ControllerActivity"-->
-<!--            android:exported="false"-->
-<!--            android:screenOrientation="landscape"-->
-<!--            android:theme="@style/AppTheme.NoActionBar" />-->
+        <!--        <activity-->
+        <!--            android:name=".ControllerActivity"-->
+        <!--            android:exported="false"-->
+        <!--            android:screenOrientation="landscape"-->
+        <!--            android:theme="@style/AppTheme.NoActionBar" />-->
 
         <activity
             android:name=".WapPointActivity"
@@ -130,12 +134,13 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:screenOrientation="landscape"
-            android:theme="@style/AppTheme.Dialog"
             android:name=".map.PickLocationActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppTheme.Dialog" />
 
-        <activity android:name="com.amap.api.maps.offlinemap.OfflineMapActivity"
+        <activity
+            android:name="com.amap.api.maps.offlinemap.OfflineMapActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />

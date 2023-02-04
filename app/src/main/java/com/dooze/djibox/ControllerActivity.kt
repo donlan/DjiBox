@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.view.*
+import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.location.AMapLocationClient
@@ -30,14 +31,19 @@ import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.dooze.djibox.databinding.ActivityControllerBinding
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.internal.controller.MainActivity
 import com.dooze.djibox.internal.utils.ToastUtils
 import com.dooze.djibox.internal.view.MainContent
 import com.dooze.djibox.map.PickLocationActivity
 import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
 import com.dooze.djibox.widgets.GimbalAdjustView
+import com.google.android.material.snackbar.Snackbar
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
+import dji.common.useraccount.UserAccountState
+import dji.common.util.CommonCallbacks.CompletionCallback
+import dji.common.util.CommonCallbacks.CompletionCallbackWith
 import dji.log.DJILog
 import dji.sdk.base.BaseComponent
 import dji.sdk.base.BaseProduct
@@ -45,6 +51,8 @@ import dji.sdk.base.BaseProduct.ComponentKey
 import dji.sdk.sdkmanager.DJISDKInitEvent
 import dji.sdk.sdkmanager.DJISDKManager
 import dji.sdk.sdkmanager.DJISDKManager.SDKManagerCallback
+import dji.sdk.useraccount.UserAccountManager
+import dji.thirdparty.sanselan.formats.tiff.TiffDirectory.description
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pdb.app.base.extensions.roundedCorner
@@ -126,6 +134,11 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.tvFunGimbalAdjust.setOnClickListener(this)
         binding.tvFunGroundMission.setOnClickListener(this)
         binding.rtkSwitcher.setOnClickListener(this)
+        binding.tvFunUserAccount.setOnClickListener(this)
+        binding.ivExit.setOnLongClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+            true
+        }
         WindowInsetsControllerCompat(
             window,
             window.decorView
@@ -280,10 +293,41 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
             true
         }
 
+
+        binding.rootDrawer.addDrawerListener(object : DrawerListener {
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                updateLoginState()
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+            }
+
+        })
+
         flightStateHelper.init(binding.mapView, binding.tvDistance)
         hotPointHelper.init(binding.mapView, this)
         wayPointHelper.init(binding.mapView, this)
         groundMissionHelper.init(binding.mapView, this)
+    }
+
+    private fun updateLoginState() {
+        when (UserAccountManager.getInstance().userAccountState) {
+            UserAccountState.AUTHORIZED -> {
+                binding.tvFunUserAccount.text = getString(R.string.uesr_logined)
+            }
+            UserAccountState.NOT_AUTHORIZED, UserAccountState.TOKEN_OUT_OF_DATE -> {
+                binding.tvFunUserAccount.text = getString(R.string.user_login_invalid)
+            }
+            else -> {
+                binding.tvFunUserAccount.text = getString(R.string.fun_login)
+            }
+        }
     }
 
     override fun onResume() {
@@ -388,6 +432,47 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 } else {
                     rtkHelper.detachCallback()
                     flightStateHelper.rtkState = null
+                }
+            }
+            R.id.tvFunUserAccount -> {
+                when (UserAccountManager.getInstance().userAccountState) {
+                    UserAccountState.AUTHORIZED -> {
+                        Snackbar.make(
+                            window.decorView,
+                            getString(R.string.fun_login_out_confirm),
+                            Snackbar.LENGTH_LONG
+                        ).setAction(getString(R.string.confirm)) {
+                            UserAccountManager.getInstance().logoutOfDJIUserAccount {
+                                if (it != null) {
+                                    showSnack(
+                                        getString(
+                                            R.string.fun_login_out_error,
+                                            it.description
+                                        )
+                                    )
+                                }
+                                updateLoginState()
+                            }
+                        }.show()
+                    }
+                    else -> {
+                        UserAccountManager.getInstance().logIntoDJIUserAccount(
+                            this,
+                            object : CompletionCallbackWith<UserAccountState> {
+                                override fun onSuccess(p0: UserAccountState?) {
+                                    updateLoginState()
+                                }
+
+                                override fun onFailure(p0: DJIError?) {
+                                    showSnack(
+                                        getString(
+                                            R.string.fun_login_in_error,
+                                            p0?.description ?: ""
+                                        )
+                                    )
+                                }
+                            })
+                    }
                 }
             }
         }

@@ -459,5 +459,11 @@
     <string name="fun_rtk_not_avaliable">飞行器未连接或者RTK功能不可用</string>
     <string name="hot_pooint_execution_start">开始热点任务。</string>
     <string name="hot_pooint_fallback_to_intelligent">尝试降级到智能热点飞行模式。</string>
+    <string name="fun_login">未登录Dji</string>
+    <string name="uesr_logined">已登录DJI</string>
+    <string name="user_login_invalid">登录已失效</string>
+    <string name="fun_login_out_confirm">是否退出登录？</string>
+    <string name="fun_login_out_error">退出登录失败。%1$s</string>
+    <string name="fun_login_in_error">登录失败。%1$s</string>
 
 </resources>
