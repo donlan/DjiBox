@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps.model.LatLng
 import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
 import com.dooze.djibox.extensions.lazyFast
@@ -17,10 +18,17 @@ import dji.common.mission.hotpoint.HotpointStartPoint
 import dji.common.mission.intelligenthotpoint.IntelligentHotpointMission
 import dji.common.mission.intelligenthotpoint.IntelligentHotpointMissionEvent
 import dji.common.model.LocationCoordinate2D
+import dji.keysdk.FlightControllerKey
+import dji.keysdk.KeyManager
+import dji.sdk.mission.MissionControl
 import dji.sdk.mission.hotpoint.HotpointMissionOperator
 import dji.sdk.mission.hotpoint.HotpointMissionOperatorListener
 import dji.sdk.mission.intelligenthotpoint.IntelligentHotpointMissionOperatorListener
+import dji.sdk.mission.timeline.TimelineElement
+import dji.sdk.mission.timeline.TimelineEvent
+import dji.sdk.mission.timeline.actions.HotpointAction
 import dji.sdk.sdkmanager.DJISDKManager
+import kotlinx.coroutines.launch
 import pdb.app.base.extensions.roundedCorner
 
 /**
@@ -31,7 +39,7 @@ import pdb.app.base.extensions.roundedCorner
  * @description:
  */
 class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), View.OnClickListener,
-    HotpointMissionOperatorListener {
+    HotpointMissionOperatorListener, MissionControl.Listener {
 
     private val binding by lazyFast {
         FragmentHotPointConfigBinding.bind(requireView())
@@ -149,9 +157,6 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     }
 
     private fun fallback(mission: HotpointMission) {
-        requireActivity().showSnack(
-            getString(R.string.hot_pooint_fallback_to_intelligent)
-        )
         val newMission = IntelligentHotpointMission().apply {
             hotpoint = mission.hotpoint
             radius = mission.radius.toFloat()
@@ -166,6 +171,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     "Fallback:${error.description}(${error.errorCode})"
                 )
             )
+            fallback2(mission)
             return
         }
         DJISDKManager.getInstance().missionControl.intelligentHotpointMissionOperator.apply {
@@ -197,10 +203,68 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                                 "${p0.description}(${p0.errorCode})"
                             )
                         )
+                        fallback2(mission)
                     }
                 }
 
             })
+        }
+    }
+
+    private fun fallback2(mission: HotpointMission) {
+        var isRun = false
+        DJISampleApplication.getAircraftInstance().flightController?.run {
+            this.setStateCallback {
+                val homeLatitude = it.homeLocation.latitude
+                val homeLongitude = it.homeLocation.longitude
+                this.setStateCallback(null)
+                if (!isRun) {
+                    timeline(homeLatitude, homeLongitude, mission)
+                }
+                isRun = true
+            }
+        } ?: kotlin.run {
+            var baseLatitude = point.latitude
+            var baseLongitude = point.longitude
+            val latitudeValue = KeyManager.getInstance()
+                .getValue(FlightControllerKey.create(FlightControllerKey.HOME_LOCATION_LATITUDE))
+            val longitudeValue = KeyManager.getInstance()
+                .getValue(FlightControllerKey.create(FlightControllerKey.HOME_LOCATION_LONGITUDE))
+
+            if (latitudeValue != null && latitudeValue is Double) {
+                baseLatitude = latitudeValue
+            }
+            if (longitudeValue != null && longitudeValue is Double) {
+                baseLongitude = longitudeValue
+            }
+            timeline(baseLatitude, baseLongitude, mission)
+        }
+
+
+    }
+
+    private fun timeline(lat: Double, lng: Double, mission: HotpointMission) {
+        val missionControl = MissionControl.getInstance()
+        val elements = ArrayList<TimelineElement>()
+        val hotpointMission = HotpointMission()
+        hotpointMission.hotpoint = LocationCoordinate2D(lat, lng)
+        hotpointMission.altitude = mission.altitude
+        hotpointMission.radius = mission.radius
+        hotpointMission.angularVelocity = mission.angularVelocity
+        val startPoint = HotpointStartPoint.NEAREST
+        hotpointMission.startPoint = startPoint
+        val heading = HotpointHeading.TOWARDS_HOT_POINT
+        hotpointMission.heading = heading
+        elements.add(HotpointAction(hotpointMission, 360f))
+        missionControl.addListener(this)
+        val error = missionControl.scheduleElements(elements)
+        if (error != null && error.errorCode != 0) {
+            binding.root.showSnack(
+                getString(
+                    R.string.hot_pooint_execution_error,
+                    "Fallback2:${error.description}(${error.errorCode})"
+                )
+            )
         }
     }
 
@@ -234,6 +298,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     }
 
     override fun onDestroyView() {
+        MissionControl.getInstance().removeAllListeners()
         DJISDKManager.getInstance().missionControl.hotpointMissionOperator.removeListener(this)
         super.onDestroyView()
     }
@@ -254,6 +319,16 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                 putString("title", title)
             }
             return fragment
+        }
+    }
+
+    override fun onEvent(p0: TimelineElement?, p1: TimelineEvent?, p2: DJIError?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            kotlin.runCatching {
+                binding.root.showSnack(
+                    "Timeline Update $p1 (${p2?.description}:${p2?.errorCode})"
+                )
+            }
         }
     }
 }
