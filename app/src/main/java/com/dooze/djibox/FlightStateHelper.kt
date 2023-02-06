@@ -121,13 +121,14 @@ class FlightStateHelper {
             flightController?.setStateCallback { djiFlightControllerCurrentState ->
 
                 if (rtkState != null) return@setStateCallback
+                val myLocation = mapView.map.myLocation ?: return@setStateCallback
 
                 val droneLocationLat = djiFlightControllerCurrentState.aircraftLocation.latitude
                 val droneLocationLng = djiFlightControllerCurrentState.aircraftLocation.longitude
                 val direction = djiFlightControllerCurrentState.aircraftHeadDirection
                 updateUIState(
                     droneLocationLat, droneLocationLng,
-                    mapView.map.myLocation.point, direction.toFloat()
+                    myLocation.point, direction.toFloat()
                 )
             }
         } else {
