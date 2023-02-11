@@ -55,7 +55,7 @@ import com.dooze.djibox.fun.radar.RadarView;
 import com.dooze.djibox.fun.remotecontroller.PushRemoteControllerDataView;
 import com.dooze.djibox.fun.timeline.TimelineMissionControlView;
 import com.dooze.djibox.fun.useraccount.LDMView;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.ExpandableListAdapter;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.model.GroupHeader;
@@ -207,7 +207,7 @@ public class DemoListView extends FrameLayout {
         expandableListView = (ExpandableListView) view.findViewById(R.id.expandable_list);
         listAdapter = new ExpandableListAdapter(context, builder.build());
         expandableListView.setAdapter(listAdapter);
-        DJISampleApplication.getEventBus().register(this);
+        App.getEventBus().register(this);
         expandAllGroupIfNeeded();
     }
 

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.PresentableView;
 
@@ -68,7 +68,7 @@ public class CameraCalibration extends RelativeLayout implements View.OnClickLis
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        camera = DJISampleApplication.getAircraftInstance().getCamera();
+        camera = App.getAircraftInstance().getCamera();
         initCallBack();
     }
 

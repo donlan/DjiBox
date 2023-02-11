@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import com.dooze.djibox.R;
 import com.dooze.djibox.internal.SeekBarValueChangeListener;
 import com.dooze.djibox.internal.audiohandler.AudioRecorderHandler;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -115,11 +115,11 @@ public class AccessoryAggregationView extends LinearLayout implements View.OnCli
 
     @Subscribe
     public void onConnectivityChange(MainActivity.ConnectivityChangeEvent event) {
-        if (!DJISampleApplication.isAircraftConnected()) {
+        if (!App.isAircraftConnected()) {
             destroyAccessoryAggregationCallback();
             return;
         }
-        Aircraft aircraft = (Aircraft) DJISampleApplication.getProductInstance();
+        Aircraft aircraft = (Aircraft) App.getProductInstance();
         if (aircraft == null || aircraft.getAccessoryAggregation() == null) {
             destroyAccessoryAggregationCallback();
             return;

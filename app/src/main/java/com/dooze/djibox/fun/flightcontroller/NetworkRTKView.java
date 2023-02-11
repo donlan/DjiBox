@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.PresentableView;
@@ -87,7 +87,7 @@ public class NetworkRTKView extends RelativeLayout implements View.OnClickListen
 
     private void initRTK() {
         if (ModuleVerificationUtil.isRTKAvailable()) {
-            rtk = DJISampleApplication.getAircraftInstance().getFlightController().getRTK();
+            rtk = App.getAircraftInstance().getFlightController().getRTK();
         }
     }
 

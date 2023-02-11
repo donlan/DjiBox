@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.view.BasePushDataView;
 
@@ -25,7 +25,7 @@ public class PushGimbalDataView extends BasePushDataView {
         super.onAttachedToWindow();
 
         if (ModuleVerificationUtil.isGimbalModuleAvailable()) {
-            DJISampleApplication.getProductInstance().getGimbal().setStateCallback(new GimbalState.Callback() {
+            App.getProductInstance().getGimbal().setStateCallback(new GimbalState.Callback() {
                 @Override
                 public void onUpdate(@NonNull GimbalState gimbalState) {
                     stringBuffer.delete(0, stringBuffer.length());
@@ -48,7 +48,7 @@ public class PushGimbalDataView extends BasePushDataView {
         super.onDetachedFromWindow();
 
         if (ModuleVerificationUtil.isGimbalModuleAvailable()) {
-            DJISampleApplication.getProductInstance().getGimbal().setStateCallback(null);
+            App.getProductInstance().getGimbal().setStateCallback(null);
         }
     }
 

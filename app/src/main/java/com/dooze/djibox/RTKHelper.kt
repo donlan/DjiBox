@@ -2,7 +2,7 @@ package com.dooze.djibox
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil
 import dji.common.error.DJIError
 import dji.common.flightcontroller.RTKState
@@ -37,7 +37,7 @@ class RTKHelper {
     fun init() {
         if (rtk != null) return
         if (ModuleVerificationUtil.isRTKAvailable()) {
-            rtk = DJISampleApplication.getAircraftInstance().flightController.rtk
+            rtk = App.getAircraftInstance().flightController.rtk
         }
     }
 

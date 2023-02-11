@@ -1,29 +1,23 @@
 package com.dooze.djibox
 
-import android.graphics.Color
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.isVisible
 import com.amap.api.maps.AMapUtils
-import com.amap.api.maps.CameraUpdateFactory
 import com.amap.api.maps.MapView
 import com.amap.api.maps.model.BitmapDescriptorFactory
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.Marker
 import com.amap.api.maps.model.MarkerOptions
 import com.dooze.djibox.extensions.mapTo
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.map.point
 import com.dooze.djibox.utils.MapConvertUtils
 import dji.common.flightcontroller.RTKState
 import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
 import pdb.app.base.extensions.showSnack
-import java.text.DecimalFormat
 
 /**
  * @author 梁桂栋
@@ -107,7 +101,7 @@ class FlightStateHelper {
     private fun initFlightController() {
         val mapView = mapView ?: return
         val context = mapView.context
-        val product = DJISampleApplication.getProductInstance()
+        val product = App.getProductInstance()
         if (product != null && product.isConnected) {
             if (product is Aircraft) {
                 val controller = product.flightController

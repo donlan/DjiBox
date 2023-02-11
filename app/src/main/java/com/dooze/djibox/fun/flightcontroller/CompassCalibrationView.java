@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
 
@@ -33,7 +33,7 @@ public class CompassCalibrationView extends BaseThreeBtnView {
 
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
             FlightController flightController =
-                ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController();
+                ((Aircraft) App.getProductInstance()).getFlightController();
 
             flightController.setStateCallback(new FlightControllerState.Callback() {
                 @Override
@@ -58,7 +58,7 @@ public class CompassCalibrationView extends BaseThreeBtnView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if(ModuleVerificationUtil.isFlightControllerAvailable()) {
-            ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController().setStateCallback(null);
+            ((Aircraft) App.getProductInstance()).getFlightController().setStateCallback(null);
         }
     }
 
@@ -70,7 +70,7 @@ public class CompassCalibrationView extends BaseThreeBtnView {
     @Override
     protected void handleRightBtnClick() {
         if (ModuleVerificationUtil.isCompassAvailable()) {
-            compass = ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController().getCompass();
+            compass = ((Aircraft) App.getProductInstance()).getFlightController().getCompass();
 
             compass.stopCalibration(new CommonCallbacks.CompletionCallback() {
                 @Override
@@ -104,7 +104,7 @@ public class CompassCalibrationView extends BaseThreeBtnView {
     @Override
     protected void handleLeftBtnClick() {
         if (ModuleVerificationUtil.isCompassAvailable()) {
-            compass = ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController().getCompass();
+            compass = ((Aircraft) App.getProductInstance()).getFlightController().getCompass();
 
             compass.startCalibration(new CommonCallbacks.CompletionCallback() {
                 @Override

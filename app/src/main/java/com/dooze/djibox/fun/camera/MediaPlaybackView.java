@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -132,7 +132,7 @@ public class MediaPlaybackView extends LinearLayout
 
     private void getFileList() {
         DJIMediaList.clear();
-        mediaManager = DJISampleApplication.getProductInstance().getCamera().getMediaManager();
+        mediaManager = App.getProductInstance().getCamera().getMediaManager();
         if (mediaManager != null) {
 
             mediaManager.refreshFileListOfStorageLocation(SettingsDefinitions.StorageLocation.SDCARD, new CommonCallbacks.CompletionCallback() {
@@ -290,7 +290,7 @@ public class MediaPlaybackView extends LinearLayout
     private boolean initDJIMedia() {
         BaseProduct product;
         try {
-            product = DJISampleApplication.getProductInstance();
+            product = App.getProductInstance();
         } catch (Exception exception) {
             product = null;
         }
@@ -300,9 +300,9 @@ public class MediaPlaybackView extends LinearLayout
             ToastUtils.setResultToToast(getContext().getResources().getString(R.string.playback_disconnected));
             return false;
         } else {
-            if (null != DJISampleApplication.getProductInstance().getCamera()
-                    && DJISampleApplication.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
-                mediaManager = DJISampleApplication.getProductInstance().getCamera().getMediaManager();
+            if (null != App.getProductInstance().getCamera()
+                    && App.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
+                mediaManager = App.getProductInstance().getCamera().getMediaManager();
 
                 if (null != mediaManager) {
                     if (mediaManager.isVideoPlaybackSupported()) {
@@ -313,7 +313,7 @@ public class MediaPlaybackView extends LinearLayout
                 SettingsDefinitions.CameraMode mode = SettingsDefinitions.CameraMode.MEDIA_DOWNLOAD;
 
                 Log.e(TAG, "Media Test set Camera Mode " + mode);
-                DJISampleApplication.getProductInstance()
+                App.getProductInstance()
                         .getCamera()
                         .setMode(mode, new CommonCallbacks.CompletionCallback() {
                             @Override
@@ -331,8 +331,8 @@ public class MediaPlaybackView extends LinearLayout
                                 }
                             }
                         });
-            } else if (null != DJISampleApplication.getProductInstance().getCamera()
-                    && !DJISampleApplication.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
+            } else if (null != App.getProductInstance().getCamera()
+                    && !App.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
                 ToastUtils.setResultToToast("Do not support Media list function");
                 return false;
             } else {
@@ -357,15 +357,15 @@ public class MediaPlaybackView extends LinearLayout
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
         isDialogAllowable = true;
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
         try {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, null);
         } catch (Exception e) {
@@ -376,8 +376,8 @@ public class MediaPlaybackView extends LinearLayout
         }
 
 
-        if (ModuleVerificationUtil.isCameraModuleAvailable() && DJISampleApplication.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
-            mediaManager = DJISampleApplication.getProductInstance().getCamera().getMediaManager();
+        if (ModuleVerificationUtil.isCameraModuleAvailable() && App.getProductInstance().getCamera().isMediaDownloadModeSupported()) {
+            mediaManager = App.getProductInstance().getCamera().getMediaManager();
 
             if (null != mediaManager) {
                 if (mediaManager.isVideoPlaybackSupported()) {

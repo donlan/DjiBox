@@ -12,7 +12,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ViewHelper;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -51,7 +51,7 @@ public class PayloadActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.sent_data).setOnClickListener(this);
         findViewById(R.id.login_sdk).setOnClickListener(this);
         if (ModuleVerificationUtil.isPayloadAvailable()) {
-            payload = DJISampleApplication.getAircraftInstance().getPayload();
+            payload = App.getAircraftInstance().getPayload();
 
             /**
              *  Gets the product name defined by the manufacturer of the payload device.

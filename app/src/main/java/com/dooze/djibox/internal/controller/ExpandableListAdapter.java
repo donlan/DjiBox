@@ -105,7 +105,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                         Constructor<? extends PresentableView> cons =
                                 ((SingleItem) item).getLinkedViewClass().getConstructor(Context.class);
                         PresentableView linkedView = cons.newInstance(context);
-                        DJISampleApplication.getEventBus()
+                        App.getEventBus()
                                 .post(new ViewWrapper((View) linkedView, item.getTitleStringId()));
                     } catch (Exception e) {
                         throw new RuntimeException("Class "
@@ -151,7 +151,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     Constructor<? extends PresentableView> cons =
                             (item.getLinkedViewClass().getConstructor(Context.class));
                     PresentableView linkedView = cons.newInstance(context);
-                    DJISampleApplication.getEventBus()
+                    App.getEventBus()
                             .post(new ViewWrapper((View) linkedView, item.getTitleStringId()));
                 } catch (Exception e) {
                     throw new RuntimeException("Class "

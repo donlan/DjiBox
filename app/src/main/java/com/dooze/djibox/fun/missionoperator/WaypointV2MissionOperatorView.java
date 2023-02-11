@@ -10,7 +10,7 @@ import com.dooze.djibox.R;
 import com.dooze.djibox.fun.missionmanager.MissionBaseView;
 import com.dooze.djibox.fun.missionoperator.util.ActionUtils;
 import com.dooze.djibox.fun.missionoperator.util.WaypointV2Factory;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 
@@ -108,9 +108,9 @@ public class WaypointV2MissionOperatorView extends MissionBaseView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (DJISampleApplication.getAircraftInstance() != null) {
+        if (App.getAircraftInstance() != null) {
             if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-                flightController = DJISampleApplication.getAircraftInstance().getFlightController();
+                flightController = App.getAircraftInstance().getFlightController();
                 flightController.setStateCallback(new FlightControllerState.Callback() {
                     @Override
                     public void onUpdate(@NonNull FlightControllerState flightControllerState) {

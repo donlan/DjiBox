@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.PresentableView;
 
@@ -97,11 +97,11 @@ public class FlightHubView extends LinearLayout implements PresentableView, View
     }
 
     private void initFC() {
-        if (DJISampleApplication.getProductInstance() == null) {
+        if (App.getProductInstance() == null) {
             flightController = null;
             ToastUtils.setResultToToast(getResources().getString(R.string.playback_disconnected));
         } else {
-            Aircraft aircraft = (Aircraft) DJISampleApplication.getProductInstance();
+            Aircraft aircraft = (Aircraft) App.getProductInstance();
             if (null != aircraft.getFlightController()) {
                 flightController = aircraft.getFlightController();
                 flightController.getSerialNumber(new CommonCallbacks.CompletionCallbackWith<String>() {

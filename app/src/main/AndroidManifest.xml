@@ -30,7 +30,7 @@
 
     <!-- SDK requirement permission end -->
     <application
-        android:name=".internal.controller.DJISampleApplication"
+        android:name=".internal.controller.App"
         android:allowBackup="true"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_dji_launcher"

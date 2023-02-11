@@ -17,7 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.dooze.djibox.R;
 import com.dooze.djibox.fun.camera.adapter.MediaFileRecyclerAdapter;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DownloadHandler;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -75,7 +75,7 @@ public class FetchMediaView extends BaseThreeBtnView {
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
             if (ModuleVerificationUtil.isMediaManagerAvailable()) {
                 if (mediaManager == null) {
-                    mediaManager = DJISampleApplication.getProductInstance().getCamera().getMediaManager();
+                    mediaManager = App.getProductInstance().getCamera().getMediaManager();
                 }
 
                 if (taskScheduler == null) {
@@ -93,9 +93,9 @@ public class FetchMediaView extends BaseThreeBtnView {
                         });
                     }
                 }
-                if (DJISampleApplication.getProductInstance()
+                if (App.getProductInstance()
                         .getCamera().isFlatCameraModeSupported()) {
-                    DJISampleApplication.getProductInstance()
+                    App.getProductInstance()
                             .getCamera().enterPlayback(djiError->{
                                 if (djiError != null) {
                                     ToastUtils.setResultToToast("enter Playback failed " + djiError.getDescription());
@@ -109,7 +109,7 @@ public class FetchMediaView extends BaseThreeBtnView {
                                 }
                     });
                 } else {
-                DJISampleApplication.getProductInstance()
+                App.getProductInstance()
                         .getCamera()
                         .setMode(SettingsDefinitions.CameraMode.MEDIA_DOWNLOAD,
                                 new CommonCallbacks.CompletionCallback() {
@@ -131,16 +131,16 @@ public class FetchMediaView extends BaseThreeBtnView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, null);
         }
         if (taskScheduler != null) {
             taskScheduler.suspend(null);
         }
-        if (DJISampleApplication.getProductInstance()
+        if (App.getProductInstance()
                 .getCamera().isFlatCameraModeSupported()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera().exitPlayback(null);
         }
         mFileBeginIndex = 1;

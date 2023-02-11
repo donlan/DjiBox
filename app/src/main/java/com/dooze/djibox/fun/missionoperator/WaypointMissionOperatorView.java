@@ -6,7 +6,7 @@ import android.view.View;
 
 import com.dooze.djibox.R;
 import com.dooze.djibox.fun.missionmanager.MissionBaseView;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ToastUtils;
 
 import java.util.ArrayList;
@@ -172,7 +172,7 @@ public class WaypointMissionOperatorView extends MissionBaseView {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        BaseProduct product = DJISampleApplication.getProductInstance();
+        BaseProduct product = App.getProductInstance();
 
         if (product == null || !product.isConnected()) {
             ToastUtils.setResultToToast("Disconnect");
@@ -389,8 +389,8 @@ public class WaypointMissionOperatorView extends MissionBaseView {
 
     private FlightController getFlightController() {
         if (null == flightController) {
-            if (null != DJISampleApplication.getAircraftInstance()) {
-                return DJISampleApplication.getAircraftInstance().getFlightController();
+            if (null != App.getAircraftInstance()) {
+                return App.getAircraftInstance().getFlightController();
             }
             ToastUtils.setResultToToast("Product is disconnected!");
         }

@@ -2,7 +2,7 @@ package com.dooze.djibox.fun.battery;
 
 import android.content.Context;
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.view.BasePushDataView;
 import dji.common.battery.BatteryState;
 
@@ -19,7 +19,7 @@ public class PushBatteryDataView extends BasePushDataView {
         super.onAttachedToWindow();
 
         try {
-            DJISampleApplication.getProductInstance().getBattery().setStateCallback(new BatteryState.Callback() {
+            App.getProductInstance().getBattery().setStateCallback(new BatteryState.Callback() {
                 @Override
                 public void onUpdate(BatteryState djiBatteryState) {
                     stringBuffer.delete(0, stringBuffer.length());
@@ -45,7 +45,7 @@ public class PushBatteryDataView extends BasePushDataView {
         super.onDetachedFromWindow();
 
         try {
-            DJISampleApplication.getProductInstance().getBattery().setStateCallback(null);
+            App.getProductInstance().getBattery().setStateCallback(null);
         } catch (Exception ignored) {
 
         }

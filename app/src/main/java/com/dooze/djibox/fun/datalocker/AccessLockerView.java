@@ -19,7 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.PresentableView;
 
@@ -106,7 +106,7 @@ public class AccessLockerView extends LinearLayout implements View.OnClickListen
 
     private void initAccessLocker() {
 
-        BaseProduct product = DJISampleApplication.getProductInstance();
+        BaseProduct product = App.getProductInstance();
 
         if (product == null || !product.isConnected() || !(product instanceof Aircraft)) {
             ToastUtils.setResultToToast("Disconnect");

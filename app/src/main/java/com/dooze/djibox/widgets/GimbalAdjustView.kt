@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.dooze.djibox.R
 import com.dooze.djibox.databinding.ViewGimbalAdjustBinding
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.internal.controller.MainActivity.RequestEndFullScreenEvent
 import com.dooze.djibox.internal.controller.MainActivity.RequestStartFullScreenEvent
 import com.dooze.djibox.internal.utils.CallbackHandlers.CallbackToastHandler
@@ -164,7 +164,7 @@ class GimbalAdjustView @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        DJISampleApplication.getEventBus().post(RequestStartFullScreenEvent())
+        App.getEventBus().post(RequestStartFullScreenEvent())
         if (getGimbalInstance() != null) {
             getGimbalInstance()!!.setMode(GimbalMode.YAW_FOLLOW, CallbackToastHandler())
         } else {
@@ -174,7 +174,7 @@ class GimbalAdjustView @JvmOverloads constructor(
     }
 
     override fun onDetachedFromWindow() {
-        DJISampleApplication.getEventBus().post(RequestEndFullScreenEvent())
+        App.getEventBus().post(RequestEndFullScreenEvent())
         currentGimbalId = 0
         tearDownListeners()
         super.onDetachedFromWindow()

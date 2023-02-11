@@ -3,7 +3,7 @@ package com.dooze.djibox.fun.camera;
 import android.content.Context;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BasePushDataView;
@@ -31,7 +31,7 @@ public class PlaybackPushInfoView extends BasePushDataView {
 
         setPlaybackStateCallback();
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.PLAYBACK,
                             new CommonCallbacks.CompletionCallback() {
@@ -55,9 +55,9 @@ public class PlaybackPushInfoView extends BasePushDataView {
         super.onDetachedFromWindow();
 
         if (ModuleVerificationUtil.isPlaybackAvailable()) {
-            DJISampleApplication.getProductInstance().getCamera().getPlaybackManager().setPlaybackStateCallback(null);
+            App.getProductInstance().getCamera().getPlaybackManager().setPlaybackStateCallback(null);
 
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO,
 
@@ -72,7 +72,7 @@ public class PlaybackPushInfoView extends BasePushDataView {
 
     private void setPlaybackStateCallback() {
         if (ModuleVerificationUtil.isPlaybackAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .getPlaybackManager()
                     .setPlaybackStateCallback(new PlaybackManager.PlaybackState.CallBack() {

@@ -30,7 +30,7 @@ import com.dooze.djibox.R;
 import com.dooze.djibox.internal.audiohandler.AudioDecoder;
 import com.dooze.djibox.internal.audiohandler.MediaRecorderHandler;
 import com.dooze.djibox.internal.audiohandler.MediaRecorderOptions;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.utils.GeneralUtils;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
@@ -98,7 +98,7 @@ public class AudioFileListManagerView extends LinearLayout implements View.OnCli
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
         createProgressDialog();
         initSpeakerCallback();
     }
@@ -121,7 +121,7 @@ public class AudioFileListManagerView extends LinearLayout implements View.OnCli
         if (audioMediaFiles != null) {
             audioMediaFiles.clear();
         }
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
     }
 
     private void initUI(Context context) {

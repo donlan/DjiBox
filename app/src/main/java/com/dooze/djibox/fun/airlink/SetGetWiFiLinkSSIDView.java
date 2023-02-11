@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.ArrayAdapter;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DialogUtils;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -41,7 +41,7 @@ public class SetGetWiFiLinkSSIDView extends BaseSetGetView {
     @Override
     protected void setMethod() {
         if (ModuleVerificationUtil.isWiFiLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getWiFiLink()
                     .setSSID(mSSIDName.get(mSpinnerSet.getSelectedItemPosition()),
@@ -57,7 +57,7 @@ public class SetGetWiFiLinkSSIDView extends BaseSetGetView {
     @Override
     protected void getMethod() {
         if (ModuleVerificationUtil.isWiFiLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getWiFiLink()
                     .getSSID(new CommonCallbacks.CompletionCallbackWith<String>() {

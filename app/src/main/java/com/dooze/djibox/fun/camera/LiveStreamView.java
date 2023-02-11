@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.Helper;
 import com.dooze.djibox.internal.utils.PopupUtils;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -153,7 +153,7 @@ public class LiveStreamView extends LinearLayout implements PresentableView, Vie
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        BaseProduct product = DJISampleApplication.getProductInstance();
+        BaseProduct product = App.getProductInstance();
         if (product == null || !product.isConnected()) {
             ToastUtils.setResultToToast("Disconnect");
             return;

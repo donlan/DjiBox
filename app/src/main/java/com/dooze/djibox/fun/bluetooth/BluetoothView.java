@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import dji.common.error.DJIError;
 import dji.common.util.CommonCallbacks;
@@ -74,7 +74,7 @@ public class BluetoothView extends LinearLayout implements View.OnClickListener 
         mBtnDisconnect.setOnClickListener(this);
         mBtnConnect.setOnClickListener(this);
 
-        connector = DJISampleApplication.getBluetoothProductConnector();
+        connector = App.getBluetoothProductConnector();
         if (connector == null) {
             ToastUtils.setResultToToast("connect is null!");
             return;

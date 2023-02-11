@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.ArrayAdapter;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.CallbackHandlers;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -29,7 +29,7 @@ public class SetGetLightbridgeLinkChannelView extends BaseSetGetView {
         super.onAttachedToWindow();
 
         if (ModuleVerificationUtil.isLightbridgeLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getLightbridgeLink()
                     .setChannelSelectionMode(ChannelSelectionMode.MANUAL,
@@ -44,7 +44,7 @@ public class SetGetLightbridgeLinkChannelView extends BaseSetGetView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ModuleVerificationUtil.isLightbridgeLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getLightbridgeLink()
                     .setChannelSelectionMode(ChannelSelectionMode.AUTO,
@@ -55,7 +55,7 @@ public class SetGetLightbridgeLinkChannelView extends BaseSetGetView {
     @Override
     protected void setMethod() {
         if (ModuleVerificationUtil.isLightbridgeLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getLightbridgeLink()
                     .setChannelNumber(mSpinnerSet.getSelectedItemPosition(),
@@ -66,7 +66,7 @@ public class SetGetLightbridgeLinkChannelView extends BaseSetGetView {
     @Override
     protected void getMethod() {
         if (ModuleVerificationUtil.isLightbridgeLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getLightbridgeLink()
                     .getChannelNumber(new CommonCallbacks.CompletionCallbackWith<Integer>() {

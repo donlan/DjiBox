@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
 import com.dooze.djibox.internal.OnScreenJoystickListener;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DialogUtils;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.OnScreenJoystick;
@@ -387,7 +387,7 @@ public class VirtualStickView extends RelativeLayout
         @Override
         public void run() {
             if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-                DJISampleApplication.getAircraftInstance()
+                App.getAircraftInstance()
                         .getFlightController()
                         .sendVirtualStickFlightControlData(new FlightControlData(pitch,
                                         roll,

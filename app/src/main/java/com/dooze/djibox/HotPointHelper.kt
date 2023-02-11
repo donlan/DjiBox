@@ -4,13 +4,11 @@ import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.amap.api.maps.MapView
 import com.amap.api.maps.model.*
 import com.dooze.djibox.extensions.mapTo
-import com.dooze.djibox.flow.FlowLayout
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.map.IPickPointMarker
 import com.dooze.djibox.utils.toDJILocation
 import com.dooze.djibox.widgets.*
@@ -45,7 +43,7 @@ class HotPointHelper : IPickPointMarker {
     fun init(mapView: MapView, activity: ControllerActivity) {
         this.mapView = mapView
         this.activity = activity
-        DJISampleApplication.getEventBus().register(this)
+        App.getEventBus().register(this)
     }
 
     @Subscribe

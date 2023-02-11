@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
@@ -39,7 +39,7 @@ public class ShootSinglePhotoView extends BaseThreeBtnView {
         Log.v("Attached To Window", "onAttachedToWindow");
 
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            camera = DJISampleApplication.getAircraftInstance().getCamera();
+            camera = App.getAircraftInstance().getCamera();
             if (ModuleVerificationUtil.isMatrice300RTK() || ModuleVerificationUtil.isMavicAir2()) {
                 camera.setFlatMode(SettingsDefinitions.FlatCameraMode.PHOTO_SINGLE, djiError -> ToastUtils.setResultToToast("setFlatMode to PHOTO_SINGLE"));
             } else {
@@ -55,7 +55,7 @@ public class ShootSinglePhotoView extends BaseThreeBtnView {
     }
 
     private boolean isModuleAvailable() {
-        return (null != DJISampleApplication.getProductInstance()) && (null != DJISampleApplication.getProductInstance()
+        return (null != App.getProductInstance()) && (null != App.getProductInstance()
                 .getCamera());
     }
 
@@ -85,7 +85,7 @@ public class ShootSinglePhotoView extends BaseThreeBtnView {
                 }
             });
 
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .startShootPhoto(new CommonCallbacks.CompletionCallback() {
                         @Override

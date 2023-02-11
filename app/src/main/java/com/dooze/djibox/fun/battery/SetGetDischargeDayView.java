@@ -6,7 +6,7 @@ import android.os.Message;
 import android.widget.ArrayAdapter;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DialogUtils;
 import com.dooze.djibox.internal.view.BaseSetGetView;
 
@@ -44,7 +44,7 @@ public class SetGetDischargeDayView extends BaseSetGetView {
     @Override
     protected void setMethod() {
         try {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getBattery()
                     .setSelfDischargeInDays((short) (mSpinnerSet.getSelectedItemPosition() + 1),
                             new CommonCallbacks.CompletionCallback() {
@@ -61,7 +61,7 @@ public class SetGetDischargeDayView extends BaseSetGetView {
     @Override
     protected void getMethod() {
         try {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getBattery()
                     .getSelfDischargeInDays(new CommonCallbacks.CompletionCallbackWith<Integer>() {
                         @Override

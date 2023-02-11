@@ -7,7 +7,7 @@ import android.util.Pair;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 
 /**
  * Created by DJI on 2/28/17.
@@ -36,7 +36,7 @@ public class ToastUtils {
     private static void showMessage(Pair<TextView, String> msg) {
         if (msg != null) {
             if (msg.first == null) {
-                Toast.makeText(DJISampleApplication.getInstance(), "tv is null", Toast.LENGTH_SHORT).show();
+                Toast.makeText(App.getInstance(), "tv is null", Toast.LENGTH_SHORT).show();
             } else {
                 msg.first.setText(msg.second);
             }
@@ -44,7 +44,7 @@ public class ToastUtils {
     }
 
     public static void showToast(String msg) {
-        Toast.makeText(DJISampleApplication.getInstance(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(App.getInstance(), msg, Toast.LENGTH_SHORT).show();
     }
 
     public static void setResultToToast(final String string) {

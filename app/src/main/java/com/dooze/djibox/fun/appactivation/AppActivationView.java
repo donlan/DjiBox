@@ -3,7 +3,7 @@ package com.dooze.djibox.fun.appactivation;
 import android.content.Context;
 import android.util.Log;
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BaseAppActivationView;
@@ -49,7 +49,7 @@ public class AppActivationView extends BaseAppActivationView {
 
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
             FlightController flightController =
-                ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController();
+                ((Aircraft) App.getProductInstance()).getFlightController();
 
             if (flightController != null) {
                 flightController.setASBInformationCallback(new AirSenseSystemInformation.Callback() {
@@ -81,7 +81,7 @@ public class AppActivationView extends BaseAppActivationView {
                 });
             }
         } else {
-            Log.i(DJISampleApplication.TAG, "onAttachedToWindow FC NOT Available");
+            Log.i(App.TAG, "onAttachedToWindow FC NOT Available");
         }
 
     }

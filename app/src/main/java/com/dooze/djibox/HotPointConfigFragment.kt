@@ -7,26 +7,27 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps.model.LatLng
 import com.dooze.djibox.databinding.FragmentHotPointConfigBinding
+import com.dooze.djibox.events.HotPointMissionEvent
 import com.dooze.djibox.extensions.lazyFast
 import com.dooze.djibox.extensions.showSnack
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import dji.common.error.DJIError
 import dji.common.mission.hotpoint.HotpointHeading
 import dji.common.mission.hotpoint.HotpointMission
 import dji.common.mission.hotpoint.HotpointMissionEvent
 import dji.common.mission.hotpoint.HotpointStartPoint
-import dji.common.mission.intelligenthotpoint.IntelligentHotpointMission
-import dji.common.mission.intelligenthotpoint.IntelligentHotpointMissionEvent
 import dji.common.model.LocationCoordinate2D
 import dji.keysdk.FlightControllerKey
 import dji.keysdk.KeyManager
 import dji.sdk.mission.MissionControl
 import dji.sdk.mission.hotpoint.HotpointMissionOperator
 import dji.sdk.mission.hotpoint.HotpointMissionOperatorListener
-import dji.sdk.mission.intelligenthotpoint.IntelligentHotpointMissionOperatorListener
 import dji.sdk.mission.timeline.TimelineElement
 import dji.sdk.mission.timeline.TimelineEvent
+import dji.sdk.mission.timeline.actions.GoHomeAction
 import dji.sdk.mission.timeline.actions.HotpointAction
+import dji.sdk.mission.timeline.actions.ShootPhotoAction
+import dji.sdk.mission.timeline.actions.TakeOffAction
 import dji.sdk.sdkmanager.DJISDKManager
 import kotlinx.coroutines.launch
 import pdb.app.base.extensions.roundedCorner
@@ -93,7 +94,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.ivClose -> {
-                DJISampleApplication.getEventBus().post(ResetHotPoint)
+                App.getEventBus().post(ResetHotPoint)
                 dismiss()
             }
             R.id.ibDone -> {
@@ -128,7 +129,6 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                             "${error.description}(${error.errorCode})"
                         )
                     )
-                    fallback(mission)
                     return
                 }
                 if (configReceiver != null) {
@@ -136,84 +136,19 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     dismiss()
                     return
                 }
-                val operator = hotPointOperator
-                    ?: DJISDKManager.getInstance().missionControl.hotpointMissionOperator.also {
-                        hotPointOperator = it
-                        it.addListener(this)
-                    }
-                operator.startMission(mission) {
-                    if (it != null) {
-                        binding.root.showSnack(
-                            getString(
-                                R.string.hot_pooint_start_mission_error,
-                                "${it.description}(${it.errorCode})"
-                            )
-                        )
-                        fallback(mission)
-                    }
-                }
+                val elements = ArrayList<TimelineElement>()
+                elements.add(TakeOffAction())
+                elements.add(ShootPhotoAction.newShootIntervalPhotoAction(10, 5))
+                elements.add(HotpointAction(mission, 360f))
+                elements.add(GoHomeAction())
+                App.getEventBus().post(HotPointMissionEvent(elements))
             }
-        }
-    }
-
-    private fun fallback(mission: HotpointMission) {
-        val newMission = IntelligentHotpointMission().apply {
-            hotpoint = mission.hotpoint
-            radius = mission.radius.toFloat()
-            altitude = mission.altitude.toFloat()
-            angularVelocity = mission.angularVelocity
-        }
-        val error = newMission.checkParameters()
-        if (error != null) {
-            requireActivity().showSnack(
-                getString(
-                    R.string.hot_pooint_config_error,
-                    "Fallback:${error.description}(${error.errorCode})"
-                )
-            )
-            fallback2(mission)
-            return
-        }
-        DJISDKManager.getInstance().missionControl.intelligentHotpointMissionOperator.apply {
-            addListener(object : IntelligentHotpointMissionOperatorListener {
-                override fun onExecutionUpdate(p0: IntelligentHotpointMissionEvent) {
-                    binding.root.showSnack(
-                        getString(
-                            R.string.hot_pooint_execution_update,
-                            "state = ${p0.currentState}"
-                        )
-                    )
-                }
-
-                override fun onExecutionStart() {
-                    binding.root.showSnack(getString(R.string.hot_pooint_execution_start))
-                }
-
-                override fun onExecutionFinish(p0: DJIError?) {
-                    if (p0 == null) {
-                        binding.root.showSnack(
-                            getString(
-                                R.string.hot_pooint_execution_finsish_success
-                            )
-                        )
-                    } else {
-                        binding.root.showSnack(
-                            getString(
-                                R.string.hot_pooint_execution_error,
-                                "${p0.description}(${p0.errorCode})"
-                            )
-                        )
-                        fallback2(mission)
-                    }
-                }
-
-            })
         }
     }
 
     private fun fallback2(mission: HotpointMission) {
         var isRun = false
-        DJISampleApplication.getAircraftInstance().flightController?.run {
+        App.getAircraftInstance().flightController?.run {
             this.setStateCallback {
                 val homeLatitude = it.homeLocation.latitude
                 val homeLongitude = it.homeLocation.longitude

@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.dooze.djibox.R
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.internal.controller.MainActivity.RequestEndFullScreenEvent
 import com.dooze.djibox.internal.controller.MainActivity.RequestStartFullScreenEvent
 import com.dooze.djibox.internal.utils.*
@@ -89,7 +89,7 @@ class MultipleLensCameraView(context: Context) : LinearLayout(context), View.OnC
             ToastUtils.setResultToText(videoStreamSourceTitle, videoStreamsSourceText)
         }
         ToastUtils.setResultToText(primaryVideoFeedTitle, newText)
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .cameras?.get(0)?.setCameraVideoStreamSourceCallback(videoStreamSourceCallback)
 
         laserMeasureInformationCallback = LaserMeasureInformation.Callback {
@@ -98,7 +98,7 @@ class MultipleLensCameraView(context: Context) : LinearLayout(context), View.OnC
         }
         //Laser Measure Information for each lens is different.
         //We only set the listener for the lens at index 0.
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .cameras?.get(0)?.getLens(0)?.setLaserMeasureInformationCallback(laserMeasureInformationCallback)
     }
 
@@ -234,20 +234,20 @@ class MultipleLensCameraView(context: Context) : LinearLayout(context), View.OnC
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        DJISampleApplication.getEventBus().post(RequestStartFullScreenEvent())
+        App.getEventBus().post(RequestStartFullScreenEvent())
     }
 
     override fun onDetachedFromWindow() {
-        DJISampleApplication.getEventBus().post(RequestEndFullScreenEvent())
+        App.getEventBus().post(RequestEndFullScreenEvent())
         tearDownListeners()
         super.onDetachedFromWindow()
     }
 
     private fun tearDownListeners() {
         VideoFeeder.getInstance().removePhysicalSourceListener(sourceListener)
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .cameras?.get(0)?.setCameraVideoStreamSourceCallback(null)
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .cameras?.get(0)?.getLens(0)?.setLaserMeasureInformationCallback(null)
     }
 
