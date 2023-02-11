@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.ArrayAdapter;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.CallbackHandlers;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -25,7 +25,7 @@ public class SetGetOcuSyncLinkView extends BaseSetGetView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (ModuleVerificationUtil.isOcuSyncLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getOcuSyncLink()
                     .setChannelSelectionMode(ChannelSelectionMode.MANUAL, new CallbackHandlers.CallbackToastHandler());
@@ -38,7 +38,7 @@ public class SetGetOcuSyncLinkView extends BaseSetGetView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ModuleVerificationUtil.isOcuSyncLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getOcuSyncLink()
                     .setChannelSelectionMode(ChannelSelectionMode.AUTO, new CallbackHandlers.CallbackToastHandler());
@@ -48,7 +48,7 @@ public class SetGetOcuSyncLinkView extends BaseSetGetView {
     @Override
     protected void setMethod() {
         if (ModuleVerificationUtil.isOcuSyncLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getOcuSyncLink()
                     .setChannelNumber(mSpinnerSet.getSelectedItemPosition(),
@@ -59,7 +59,7 @@ public class SetGetOcuSyncLinkView extends BaseSetGetView {
     @Override
     protected void getMethod() {
         if (ModuleVerificationUtil.isOcuSyncLinkAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getAirLink()
                     .getOcuSyncLink()
                     .getChannelNumber(new CommonCallbacks.CompletionCallbackWith<Integer>() {
@@ -81,7 +81,7 @@ public class SetGetOcuSyncLinkView extends BaseSetGetView {
     protected ArrayAdapter getArrayAdapter() {
         ArrayList<Integer> array = new ArrayList<>();
         if (ModuleVerificationUtil.isOcuSyncLinkAvailable()) {
-            DJISampleApplication.getAircraftInstance()
+            App.getAircraftInstance()
                     .getAirLink()
                     .getOcuSyncLink()
                     .getChannelNumberValidRange(new CommonCallbacks.CompletionCallbackWith<Integer[]>() {

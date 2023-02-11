@@ -11,7 +11,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 
@@ -61,7 +61,7 @@ public class PayloadWidgetActivity extends AppCompatActivity {
         widgetValue = (EditText) findViewById(R.id.widgetValue);
         configureWidgetValue = (Button) findViewById(R.id.configureWidgetValue);
         if (ModuleVerificationUtil.isPayloadAvailable()) {
-            payload = DJISampleApplication.getAircraftInstance().getPayload();
+            payload = App.getAircraftInstance().getPayload();
             printWidget();
         }
         initListener();

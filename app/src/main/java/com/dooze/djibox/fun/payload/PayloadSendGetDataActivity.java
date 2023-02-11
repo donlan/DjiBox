@@ -14,7 +14,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.GeneralUtils;
 import com.dooze.djibox.internal.utils.ViewHelper;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
@@ -90,7 +90,7 @@ public class PayloadSendGetDataActivity extends AppCompatActivity implements Vie
         View sendButton = findViewById(R.id.send_data_button);
         sendButton.setOnClickListener(this);
         if (ModuleVerificationUtil.isPayloadAvailable()) {
-            payload = DJISampleApplication.getAircraftInstance().getPayload();
+            payload = App.getAircraftInstance().getPayload();
 
             /**
              *  Gets the product name defined by the manufacturer of the payload device.

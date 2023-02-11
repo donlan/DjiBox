@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.PresentableView;
@@ -45,7 +45,7 @@ public class PlaybackCommandsView extends RelativeLayout implements View.OnClick
         super.onAttachedToWindow();
         if (ModuleVerificationUtil.isPlaybackAvailable()) {
 
-            camera = DJISampleApplication.getAircraftInstance().getCamera();
+            camera = App.getAircraftInstance().getCamera();
 
             camera.setMode(SettingsDefinitions.CameraMode.PLAYBACK, new CommonCallbacks.CompletionCallback() {
                 @Override
@@ -54,7 +54,7 @@ public class PlaybackCommandsView extends RelativeLayout implements View.OnClick
                 }
             });
 
-            DJISampleApplication.getProductInstance().
+            App.getProductInstance().
                     getCamera().getPlaybackManager().setPlaybackStateCallback(new PlaybackManager.PlaybackState.CallBack() {
                 @Override
                 public void onUpdate(PlaybackManager.PlaybackState playbackState) {
@@ -71,7 +71,7 @@ public class PlaybackCommandsView extends RelativeLayout implements View.OnClick
                 }
             });
 
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.PLAYBACK,
                             new CommonCallbacks.CompletionCallback() {
@@ -88,7 +88,7 @@ public class PlaybackCommandsView extends RelativeLayout implements View.OnClick
     @Override
     protected void onDetachedFromWindow() {
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO,
 
@@ -100,7 +100,7 @@ public class PlaybackCommandsView extends RelativeLayout implements View.OnClick
                             });
 
             if (ModuleVerificationUtil.isPlaybackAvailable()) {
-                DJISampleApplication.getProductInstance().
+                App.getProductInstance().
                         getCamera().getPlaybackManager().setPlaybackStateCallback(null);
             }
         }
@@ -138,34 +138,34 @@ public class PlaybackCommandsView extends RelativeLayout implements View.OnClick
         switch (v.getId()) {
             case R.id.btn_previous:
                 if (isSinglePreview) {
-                    DJISampleApplication.getProductInstance().getCamera().
+                    App.getProductInstance().getCamera().
                             getPlaybackManager().proceedToPreviousSinglePreviewPage();
                 } else {
-                    DJISampleApplication.getProductInstance().getCamera().
+                    App.getProductInstance().getCamera().
                             getPlaybackManager().enterMultiplePreviewMode();
                 }
                 break;
 
             case R.id.btn_next:
                 if (isSinglePreview) {
-                    DJISampleApplication.getProductInstance().getCamera().
+                    App.getProductInstance().getCamera().
                             getPlaybackManager().proceedToNextSinglePreviewPage();
                 } else {
-                    DJISampleApplication.getProductInstance().getCamera().
+                    App.getProductInstance().getCamera().
                             getPlaybackManager().proceedToNextMultiplePreviewPage();
                 }
                 break;
 
             case R.id.btn_multiple:
                 if (isSinglePreview) {
-                    DJISampleApplication.getProductInstance().getCamera().
+                    App.getProductInstance().getCamera().
                             getPlaybackManager().enterMultiplePreviewMode();
                 }
                 break;
 
             case R.id.btn_single:
                 if (!isSinglePreview) {
-                    DJISampleApplication.getProductInstance().
+                    App.getProductInstance().
                             getCamera().getPlaybackManager().enterSinglePreviewModeWithIndex(0);
                 }
                 break;

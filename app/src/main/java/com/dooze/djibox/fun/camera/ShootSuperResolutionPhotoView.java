@@ -11,7 +11,7 @@ import android.widget.RelativeLayout;
 
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
@@ -60,7 +60,7 @@ public class ShootSuperResolutionPhotoView extends BaseThreeBtnView implements S
      * 如下inputArea 是2*2的矩形框也可自行设置
      */
     private void initCameraParams() {
-        camera = DJISampleApplication.getAircraftInstance().getCamera();
+        camera = App.getAircraftInstance().getCamera();
         if (camera.isFlatCameraModeSupported()) {
             //
             RectF inputArea = new RectF(0.35f, 0.25f, 0.65f, 0.55f);
@@ -83,7 +83,7 @@ public class ShootSuperResolutionPhotoView extends BaseThreeBtnView implements S
     }
 
     private boolean isModuleAvailable() {
-        return (null != DJISampleApplication.getProductInstance()) && (null != DJISampleApplication.getProductInstance()
+        return (null != App.getProductInstance()) && (null != App.getProductInstance()
                 .getCamera());
     }
 
@@ -110,7 +110,7 @@ public class ShootSuperResolutionPhotoView extends BaseThreeBtnView implements S
                 middleBtn.setEnabled(false);
             });
 
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .startShootPhoto(djiError -> {
                         if (null == djiError) {
@@ -166,7 +166,7 @@ public class ShootSuperResolutionPhotoView extends BaseThreeBtnView implements S
      * 获取最新拍的超清矩阵照片
      */
     private void getFileList() {
-        mediaManager = DJISampleApplication.getProductInstance().getCamera().getMediaManager();
+        mediaManager = App.getProductInstance().getCamera().getMediaManager();
         if (mediaManager != null) {
             mediaManager.refreshFileListOfStorageLocation(SettingsDefinitions.StorageLocation.SDCARD, djiError -> {
                 if (djiError == null) {

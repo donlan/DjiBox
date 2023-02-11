@@ -11,7 +11,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.utils.CallbackHandlers;
 import com.dooze.djibox.internal.utils.Helper;
@@ -91,7 +91,7 @@ public class GimbalCapabilityView extends LinearLayout implements View.OnClickLi
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
         setupButtonsState();
         enablePitchExtensionIfPossible();
         if (getGimbalInstance() != null) {
@@ -104,7 +104,7 @@ public class GimbalCapabilityView extends LinearLayout implements View.OnClickLi
 
     @Override
     protected void onDetachedFromWindow() {
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
         currentGimbalId = 0;
         tearDownListeners();
         super.onDetachedFromWindow();

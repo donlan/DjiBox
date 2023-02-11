@@ -3,7 +3,6 @@ package com.dooze.djibox.internal.view;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,10 +25,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.dooze.djibox.ControllerActivity;
 import com.dooze.djibox.R;
 import com.dooze.djibox.fun.bluetooth.BluetoothView;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.model.ViewWrapper;
 import com.dooze.djibox.internal.utils.DialogUtils;
@@ -139,7 +137,7 @@ public class MainContent extends RelativeLayout {
         if (isInEditMode()) {
             return;
         }
-        DJISampleApplication.getEventBus().register(this);
+        App.getEventBus().register(this);
         initUI();
     }
 
@@ -181,7 +179,7 @@ public class MainContent extends RelativeLayout {
                 if (GeneralUtils.isFastDoubleClick()) {
                     return;
                 }
-                 DJISampleApplication.getEventBus().post(componentList);
+                 App.getEventBus().post(componentList);
             }
         });
         mBtnBluetooth.setOnClickListener(new OnClickListener() {
@@ -190,13 +188,13 @@ public class MainContent extends RelativeLayout {
                 if (GeneralUtils.isFastDoubleClick()) {
                     return;
                 }
-                if (DJISampleApplication.getBluetoothProductConnector() == null) {
+                if (App.getBluetoothProductConnector() == null) {
                     ToastUtils.setResultToToast("pls wait the sdk initiation finished");
                     return;
                 }
                 bluetoothView =
                         new ViewWrapper(new BluetoothView(getContext()), R.string.component_listview_bluetooth);
-                DJISampleApplication.getEventBus().post(bluetoothView);
+                App.getEventBus().post(bluetoothView);
             }
         });
         mBridgeModeEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -266,7 +264,7 @@ public class MainContent extends RelativeLayout {
                     switch (msg.what) {
                         case MSG_UPDATE_BLUETOOTH_CONNECTOR:
                             //connected = DJISampleApplication.getBluetoothConnectStatus();
-                            connector = DJISampleApplication.getBluetoothProductConnector();
+                            connector = App.getBluetoothProductConnector();
 
                             if (connector != null) {
                                 mBtnBluetooth.post(new Runnable() {
@@ -350,7 +348,7 @@ public class MainContent extends RelativeLayout {
     }
 
     private void refreshSDKRelativeUI() {
-        mProduct = DJISampleApplication.getProductInstance();
+        mProduct = App.getProductInstance();
         Log.d(TAG, "mProduct: " + (mProduct == null ? "null" : "unnull"));
         if (null != mProduct) {
             if (mProduct.isConnected()) {
@@ -686,7 +684,7 @@ public class MainContent extends RelativeLayout {
     }
 
     private void notifyStatusChange() {
-        DJISampleApplication.getEventBus().post(new MainActivity.ConnectivityChangeEvent());
+        App.getEventBus().post(new MainActivity.ConnectivityChangeEvent());
     }
     //endregion
 }

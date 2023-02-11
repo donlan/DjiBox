@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
 
@@ -40,7 +40,7 @@ public class FlightAssistantPushDataView extends BaseThreeBtnView {
 
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
             FlightController flightController =
-                ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController();
+                ((Aircraft) App.getProductInstance()).getFlightController();
 
             FlightAssistant intelligentFlightAssistant = flightController.getFlightAssistant();
 
@@ -98,7 +98,7 @@ public class FlightAssistantPushDataView extends BaseThreeBtnView {
 
             changeDescription(stringBuilder.toString());
         } else {
-            Log.i(DJISampleApplication.TAG, "onAttachedToWindow FC NOT Available");
+            Log.i(App.TAG, "onAttachedToWindow FC NOT Available");
         }
     }
 
@@ -106,7 +106,7 @@ public class FlightAssistantPushDataView extends BaseThreeBtnView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-            FlightAssistant intelligentFlightAssistant = ((Aircraft) DJISampleApplication.getProductInstance()).getFlightController().getFlightAssistant();
+            FlightAssistant intelligentFlightAssistant = ((Aircraft) App.getProductInstance()).getFlightController().getFlightAssistant();
             if(intelligentFlightAssistant != null) {
                 intelligentFlightAssistant.setVisionDetectionStateUpdatedCallback(null);
             }

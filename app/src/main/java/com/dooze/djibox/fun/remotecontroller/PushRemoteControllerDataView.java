@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.view.BasePushDataView;
 
@@ -29,7 +29,7 @@ public class PushRemoteControllerDataView extends BasePushDataView {
         super.onAttachedToWindow();
 
         if (ModuleVerificationUtil.isRemoteControllerAvailable()) {
-            remoteController = ((Aircraft) DJISampleApplication.getProductInstance()).getRemoteController();
+            remoteController = ((Aircraft) App.getProductInstance()).getRemoteController();
 
             remoteController.setHardwareStateCallback(new HardwareState.HardwareStateCallback() {
                 @Override
@@ -54,7 +54,7 @@ public class PushRemoteControllerDataView extends BasePushDataView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (ModuleVerificationUtil.isRemoteControllerAvailable()) {
-            remoteController = ((Aircraft) DJISampleApplication.getProductInstance()).getRemoteController();
+            remoteController = ((Aircraft) App.getProductInstance()).getRemoteController();
 
             remoteController.setHardwareStateCallback(null);
         }

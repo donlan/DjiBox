@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Environment;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
@@ -36,7 +36,7 @@ public class PlaybackDownloadView extends BaseThreeBtnView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            Camera camera = DJISampleApplication.getAircraftInstance().getCamera();
+            Camera camera = App.getAircraftInstance().getCamera();
 
             camera.setMode(SettingsDefinitions.CameraMode.PLAYBACK, new CommonCallbacks.CompletionCallback() {
                 @Override
@@ -70,7 +70,7 @@ public class PlaybackDownloadView extends BaseThreeBtnView {
     @Override
     protected void onDetachedFromWindow() {
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO,
                             new CommonCallbacks.CompletionCallback() {
@@ -81,7 +81,7 @@ public class PlaybackDownloadView extends BaseThreeBtnView {
                             });
 
             if (ModuleVerificationUtil.isPlaybackAvailable()) {
-                DJISampleApplication.getProductInstance().
+                App.getProductInstance().
                         getCamera().getPlaybackManager().setPlaybackStateCallback(null);
             }
         }
@@ -115,7 +115,7 @@ public class PlaybackDownloadView extends BaseThreeBtnView {
     @Override
     protected void handleMiddleBtnClick() {
         if (ModuleVerificationUtil.isPlaybackAvailable()) {
-            playbackManager = DJISampleApplication.getProductInstance().getCamera().getPlaybackManager();
+            playbackManager = App.getProductInstance().getCamera().getPlaybackManager();
 
             playbackManager.toggleFileSelectionAtIndex(0);
         }
@@ -124,7 +124,7 @@ public class PlaybackDownloadView extends BaseThreeBtnView {
     @Override
     protected void handleLeftBtnClick() {
         if (ModuleVerificationUtil.isPlaybackAvailable()) {
-            playbackManager = DJISampleApplication.getProductInstance().getCamera().getPlaybackManager();
+            playbackManager = App.getProductInstance().getCamera().getPlaybackManager();
 
             playbackManager.toggleFileSelectionAtIndex(1);
         }
@@ -134,7 +134,7 @@ public class PlaybackDownloadView extends BaseThreeBtnView {
     protected void handleRightBtnClick() {
         // Download Button
         if (ModuleVerificationUtil.isPlaybackAvailable()) {
-            playbackManager = DJISampleApplication.getProductInstance().getCamera().getPlaybackManager();
+            playbackManager = App.getProductInstance().getCamera().getPlaybackManager();
 
             File destDir = new File(Environment.getExternalStorageDirectory().
                     getPath() + "/Dji_Sdk_Test/");

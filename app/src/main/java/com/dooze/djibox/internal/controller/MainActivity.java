@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DJISampleApplication.getEventBus().register(this);
+        App.getEventBus().register(this);
         setContentView(R.layout.activity_main);
         setupActionBar();
         contentFrameLayout = (FrameLayout) findViewById(R.id.framelayout_content);
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        DJISampleApplication.getEventBus().unregister(this);
+        App.getEventBus().unregister(this);
         super.onDestroy();
     }
 
@@ -84,20 +84,20 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                DJISampleApplication.getEventBus().post(new SearchQueryEvent(""));
+                App.getEventBus().post(new SearchQueryEvent(""));
                 return false;
             }
         });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                DJISampleApplication.getEventBus().post(new SearchQueryEvent(query));
+                App.getEventBus().post(new SearchQueryEvent(query));
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                DJISampleApplication.getEventBus().post(new SearchQueryEvent(newText));
+                App.getEventBus().post(new SearchQueryEvent(newText));
                 return false;
             }
         });
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             ViewWrapper wrapper = stack.peek();
             titleTextView.setText(wrapper.getTitleId());
         } else if (stack.size() == 1) {
-            BaseProduct product = DJISampleApplication.getProductInstance();
+            BaseProduct product = App.getProductInstance();
             if (product != null && product.getModel() != null) {
                 titleTextView.setText("" + product.getModel().getDisplayName());
             } else {

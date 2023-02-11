@@ -6,7 +6,7 @@ import android.os.Message;
 import android.widget.ArrayAdapter;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DialogUtils;
 import com.dooze.djibox.internal.view.BaseSetGetView;
 
@@ -60,15 +60,15 @@ public class SetGetISOView extends BaseSetGetView {
 
     @Override
     protected void setMethod() {
-        if (null != DJISampleApplication.getProductInstance()) {
-            if (null != DJISampleApplication.getProductInstance().getCamera()) {
+        if (null != App.getProductInstance()) {
+            if (null != App.getProductInstance().getCamera()) {
                 mHandler.post(runSetShootPhotoCameraMode);
             }
         }
     }
 
     private void setShootPhotoCameraMode() {
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .getCamera()
                 .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO,
                         new CommonCallbacks.CompletionCallback() {
@@ -82,7 +82,7 @@ public class SetGetISOView extends BaseSetGetView {
     }
 
     private void setManualExposureMode() {
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .getCamera()
                 .setExposureMode(SettingsDefinitions.ExposureMode.MANUAL,
                         new CommonCallbacks.CompletionCallback() {
@@ -101,7 +101,7 @@ public class SetGetISOView extends BaseSetGetView {
         if (mSpinnerSet.getSelectedItemPosition() != 0) {
             cameraISO = isoArray[mSpinnerSet.getSelectedItemPosition()];
         }
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .getCamera()
                 .setISO(cameraISO, new CommonCallbacks.CompletionCallback() {
                     @Override
@@ -113,7 +113,7 @@ public class SetGetISOView extends BaseSetGetView {
 
     @Override
     protected void getMethod() {
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .getCamera()
                 .getISO(new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.ISO>() {
                     @Override

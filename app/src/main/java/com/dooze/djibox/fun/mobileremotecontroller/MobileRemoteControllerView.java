@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
 import com.dooze.djibox.internal.OnScreenJoystickListener;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DialogUtils;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.OnScreenJoystick;
@@ -134,7 +134,7 @@ public class MobileRemoteControllerView extends RelativeLayout
         }
         try {
             mobileRemoteController =
-                ((Aircraft) DJISampleApplication.getAircraftInstance()).getMobileRemoteController();
+                ((Aircraft) App.getAircraftInstance()).getMobileRemoteController();
         } catch (Exception exception) {
             exception.printStackTrace();
         }

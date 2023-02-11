@@ -1,7 +1,7 @@
 package com.dooze.djibox.internal.utils;
 
 
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 
 import androidx.annotation.Nullable;
 import dji.common.product.Model;
@@ -20,45 +20,45 @@ import dji.sdk.products.HandHeld;
  */
 public class ModuleVerificationUtil {
     public static boolean isProductModuleAvailable() {
-        return (null != DJISampleApplication.getProductInstance());
+        return (null != App.getProductInstance());
     }
 
     public static boolean isAircraft() {
-        return DJISampleApplication.getProductInstance() instanceof Aircraft;
+        return App.getProductInstance() instanceof Aircraft;
     }
 
     public static boolean isHandHeld() {
-        return DJISampleApplication.getProductInstance() instanceof HandHeld;
+        return App.getProductInstance() instanceof HandHeld;
     }
 
     public static boolean isCameraModuleAvailable() {
-        return isProductModuleAvailable() && (null != DJISampleApplication.getProductInstance().getCamera());
+        return isProductModuleAvailable() && (null != App.getProductInstance().getCamera());
     }
 
     public static boolean isPlaybackAvailable() {
-        return isCameraModuleAvailable() && (null != DJISampleApplication.getProductInstance()
+        return isCameraModuleAvailable() && (null != App.getProductInstance()
                 .getCamera()
                 .getPlaybackManager());
     }
 
     public static boolean isMediaManagerAvailable() {
-        return isCameraModuleAvailable() && (null != DJISampleApplication.getProductInstance()
+        return isCameraModuleAvailable() && (null != App.getProductInstance()
                 .getCamera()
                 .getMediaManager());
     }
 
     public static boolean isRemoteControllerAvailable() {
-        return isProductModuleAvailable() && isAircraft() && (null != DJISampleApplication.getAircraftInstance()
+        return isProductModuleAvailable() && isAircraft() && (null != App.getAircraftInstance()
                 .getRemoteController());
     }
 
     public static boolean isFlightControllerAvailable() {
-        return isProductModuleAvailable() && isAircraft() && (null != DJISampleApplication.getAircraftInstance()
+        return isProductModuleAvailable() && isAircraft() && (null != App.getAircraftInstance()
                 .getFlightController());
     }
 
     public static boolean isCompassAvailable() {
-        return isFlightControllerAvailable() && isAircraft() && (null != DJISampleApplication.getAircraftInstance()
+        return isFlightControllerAvailable() && isAircraft() && (null != App.getAircraftInstance()
                 .getFlightController()
                 .getCompass());
     }
@@ -68,41 +68,41 @@ public class ModuleVerificationUtil {
     }
 
     public static boolean isGimbalModuleAvailable() {
-        return isProductModuleAvailable() && (null != DJISampleApplication.getProductInstance().getGimbal());
+        return isProductModuleAvailable() && (null != App.getProductInstance().getGimbal());
     }
 
     public static boolean isAirlinkAvailable() {
-        return isProductModuleAvailable() && (null != DJISampleApplication.getProductInstance().getAirLink());
+        return isProductModuleAvailable() && (null != App.getProductInstance().getAirLink());
     }
 
     public static boolean isWiFiLinkAvailable() {
-        return isAirlinkAvailable() && (null != DJISampleApplication.getProductInstance().getAirLink().getWiFiLink());
+        return isAirlinkAvailable() && (null != App.getProductInstance().getAirLink().getWiFiLink());
     }
 
     public static boolean isLightbridgeLinkAvailable() {
-        return isAirlinkAvailable() && (null != DJISampleApplication.getProductInstance()
+        return isAirlinkAvailable() && (null != App.getProductInstance()
                 .getAirLink()
                 .getLightbridgeLink());
     }
 
     public static boolean isOcuSyncLinkAvailable() {
-        return isAirlinkAvailable() && (null != DJISampleApplication.getProductInstance()
+        return isAirlinkAvailable() && (null != App.getProductInstance()
                 .getAirLink()
                 .getOcuSyncLink());
     }
 
     public static boolean isPayloadAvailable() {
-        return isProductModuleAvailable() && isAircraft() && (null != DJISampleApplication.getAircraftInstance()
+        return isProductModuleAvailable() && isAircraft() && (null != App.getAircraftInstance()
                 .getPayload());
     }
 
     public static boolean isRTKAvailable() {
-        return isProductModuleAvailable() && isAircraft() && (null != DJISampleApplication.getAircraftInstance()
+        return isProductModuleAvailable() && isAircraft() && (null != App.getAircraftInstance()
                 .getFlightController().getRTK());
     }
 
     public static AccessoryAggregation getAccessoryAggregation() {
-        Aircraft aircraft = (Aircraft) DJISampleApplication.getProductInstance();
+        Aircraft aircraft = (Aircraft) App.getProductInstance();
 
         if (aircraft != null && null != aircraft.getAccessoryAggregation()) {
             return aircraft.getAccessoryAggregation();
@@ -111,7 +111,7 @@ public class ModuleVerificationUtil {
     }
 
     public static Speaker getSpeaker() {
-        Aircraft aircraft = (Aircraft) DJISampleApplication.getProductInstance();
+        Aircraft aircraft = (Aircraft) App.getProductInstance();
 
         if (aircraft != null && null != aircraft.getAccessoryAggregation() && null != aircraft.getAccessoryAggregation().getSpeaker()) {
             return aircraft.getAccessoryAggregation().getSpeaker();
@@ -120,7 +120,7 @@ public class ModuleVerificationUtil {
     }
 
     public static Beacon getBeacon() {
-        Aircraft aircraft = (Aircraft) DJISampleApplication.getProductInstance();
+        Aircraft aircraft = (Aircraft) App.getProductInstance();
 
         if (aircraft != null && null != aircraft.getAccessoryAggregation() && null != aircraft.getAccessoryAggregation().getBeacon()) {
             return aircraft.getAccessoryAggregation().getBeacon();
@@ -129,7 +129,7 @@ public class ModuleVerificationUtil {
     }
 
     public static Spotlight getSpotlight() {
-        Aircraft aircraft = (Aircraft) DJISampleApplication.getProductInstance();
+        Aircraft aircraft = (Aircraft) App.getProductInstance();
 
         if (aircraft != null && null != aircraft.getAccessoryAggregation() && null != aircraft.getAccessoryAggregation().getSpotlight()) {
             return aircraft.getAccessoryAggregation().getSpotlight();
@@ -139,7 +139,7 @@ public class ModuleVerificationUtil {
 
     @Nullable
     public static Simulator getSimulator() {
-        Aircraft aircraft = DJISampleApplication.getAircraftInstance();
+        Aircraft aircraft = App.getAircraftInstance();
         if (aircraft != null) {
             FlightController flightController = aircraft.getFlightController();
             if (flightController != null) {
@@ -151,7 +151,7 @@ public class ModuleVerificationUtil {
 
     @Nullable
     public static FlightController getFlightController() {
-        Aircraft aircraft = DJISampleApplication.getAircraftInstance();
+        Aircraft aircraft = App.getAircraftInstance();
         if (aircraft != null) {
             return aircraft.getFlightController();
         }
@@ -160,7 +160,7 @@ public class ModuleVerificationUtil {
 
     @Nullable
     public static boolean isMavic2Product() {
-        BaseProduct baseProduct = DJISampleApplication.getProductInstance();
+        BaseProduct baseProduct = App.getProductInstance();
         if (baseProduct != null) {
             return baseProduct.getModel() == Model.MAVIC_2_PRO || baseProduct.getModel() == Model.MAVIC_2_ZOOM;
         }
@@ -168,7 +168,7 @@ public class ModuleVerificationUtil {
     }
 
     public static boolean isMatrice300RTK(){
-        BaseProduct baseProduct = DJISampleApplication.getProductInstance();
+        BaseProduct baseProduct = App.getProductInstance();
         if (baseProduct != null) {
             return baseProduct.getModel() == Model.MATRICE_300_RTK;
         }
@@ -176,7 +176,7 @@ public class ModuleVerificationUtil {
     }
 
     public static boolean isMavicAir2(){
-        BaseProduct baseProduct = DJISampleApplication.getProductInstance();
+        BaseProduct baseProduct = App.getProductInstance();
         if (baseProduct != null) {
             return baseProduct.getModel() == Model.MAVIC_AIR_2;
         }

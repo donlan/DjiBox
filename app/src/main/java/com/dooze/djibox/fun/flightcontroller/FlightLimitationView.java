@@ -3,7 +3,7 @@ package com.dooze.djibox.fun.flightcontroller;
 import android.content.Context;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.DialogUtils;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -45,7 +45,7 @@ public class FlightLimitationView extends BaseThreeBtnView {
     @Override
     protected void handleMiddleBtnClick() {
         if (ModuleVerificationUtil.isFlightLimitationAvailable()) {
-            DJISampleApplication.getAircraftInstance()
+            App.getAircraftInstance()
                     .getFlightController()
                     .setMaxFlightHeight(100, new CommonCallbacks.CompletionCallback() {
                         @Override
@@ -61,7 +61,7 @@ public class FlightLimitationView extends BaseThreeBtnView {
     @Override
     protected void handleLeftBtnClick() {
         if (ModuleVerificationUtil.isFlightLimitationAvailable()) {
-            DJISampleApplication.getAircraftInstance()
+            App.getAircraftInstance()
                     .getFlightController()
                     .setMaxFlightRadiusLimitationEnabled(mRadiusLimitaionToggleFlag,
                             new CommonCallbacks.CompletionCallback() {
@@ -79,7 +79,7 @@ public class FlightLimitationView extends BaseThreeBtnView {
     @Override
     protected void handleRightBtnClick() {
         if (ModuleVerificationUtil.isFlightLimitationAvailable()) {
-            DJISampleApplication.getAircraftInstance()
+            App.getAircraftInstance()
                     .getFlightController()
                     .setMaxFlightRadius(40, new CommonCallbacks.CompletionCallback() {
                         @Override

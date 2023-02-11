@@ -3,7 +3,7 @@ package com.dooze.djibox.fun.camera;
 import android.content.Context;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.view.BasePushDataView;
 
@@ -25,7 +25,7 @@ public class PushCameraDataView extends BasePushDataView {
 
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
             try {
-                DJISampleApplication.getProductInstance().getCamera().setSystemStateCallback(new SystemState.Callback() {
+                App.getProductInstance().getCamera().setSystemStateCallback(new SystemState.Callback() {
                     @Override
                     public void onUpdate(SystemState cameraSystemState) {
                         if (null != cameraSystemState) {
@@ -48,10 +48,10 @@ public class PushCameraDataView extends BasePushDataView {
 
             //Get Thermal Camera Temperature
             try {
-                if (DJISampleApplication.getProductInstance().getCamera().isThermalCamera()) {
-                    if (DJISampleApplication.getProductInstance().getCamera().getDisplayName() == Camera.DisplayNameXT) {
+                if (App.getProductInstance().getCamera().isThermalCamera()) {
+                    if (App.getProductInstance().getCamera().getDisplayName() == Camera.DisplayNameXT) {
                         //display thermal temperature
-                        DJISampleApplication.getProductInstance()
+                        App.getProductInstance()
                                 .getCamera()
                                 .setThermalTemperatureCallback(new Camera.TemperatureDataCallback() {
                                     @Override
@@ -76,9 +76,9 @@ public class PushCameraDataView extends BasePushDataView {
 
         try {
             if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-                DJISampleApplication.getProductInstance().getCamera().setSystemStateCallback(null);
-                if (DJISampleApplication.getProductInstance().getCamera().isThermalCamera()) {
-                    DJISampleApplication.getProductInstance()
+                App.getProductInstance().getCamera().setSystemStateCallback(null);
+                if (App.getProductInstance().getCamera().isThermalCamera()) {
+                    App.getProductInstance()
                             .getCamera()
                             .setThermalTemperatureCallback(null);
                 }

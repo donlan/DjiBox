@@ -29,7 +29,7 @@ import com.amap.api.maps.model.*
 import com.dooze.djibox.BuildConfig
 import com.dooze.djibox.R
 import com.dooze.djibox.extensions.makeVibrate
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
 import com.dooze.djibox.point
@@ -130,7 +130,7 @@ class FlightLocationView @JvmOverloads constructor(
 
 
     private fun initFlightController() {
-        val product = DJISampleApplication.getProductInstance()
+        val product = App.getProductInstance()
         if (product != null && product.isConnected) {
             if (product is Aircraft) {
                 val controller = product.flightController

@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.GeneralUtils;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.PresentableView;
@@ -410,7 +410,7 @@ public class TimelineMissionControlView extends LinearLayout implements OnClickL
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        BaseProduct product = DJISampleApplication.getProductInstance();
+        BaseProduct product = App.getProductInstance();
 
         if (product == null || !product.isConnected()) {
             ToastUtils.setResultToToast("Disconnect");
@@ -461,7 +461,7 @@ public class TimelineMissionControlView extends LinearLayout implements OnClickL
     public void onClick(View v) {
 
         if (v.getId() == R.id.btn_get_homepoint) {
-            if (DJISampleApplication.getProductInstance() instanceof Aircraft && !GeneralUtils.checkGpsCoordinate(
+            if (App.getProductInstance() instanceof Aircraft && !GeneralUtils.checkGpsCoordinate(
                 homeLatitude,
                 homeLongitude) && flightController != null) {
                 flightController.getHomeLocation(new CommonCallbacks.CompletionCallbackWith<LocationCoordinate2D>() {

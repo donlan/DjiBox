@@ -17,14 +17,14 @@ import dji.sdk.sdkmanager.DJISDKManager;
 /**
  * Main application
  */
-public class DJISampleApplication extends Application {
+public class App extends Application {
 
-    public static final String TAG = DJISampleApplication.class.getName();
+    public static final String TAG = App.class.getName();
 
     private static BaseProduct product;
     private static BluetoothProductConnector bluetoothConnector = null;
     private static Bus bus = new Bus(ThreadEnforcer.ANY);
-    private static DJISampleApplication app = null;
+    private static App app = null;
 
     /**
      * Gets instance of the specific product connected after the
@@ -63,8 +63,8 @@ public class DJISampleApplication extends Application {
         return (HandHeld) getProductInstance();
     }
 
-    public static DJISampleApplication getInstance() {
-        return DJISampleApplication.app;
+    public static App getInstance() {
+        return App.app;
     }
 
     public static Bus getEventBus() {

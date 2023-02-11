@@ -29,8 +29,10 @@ import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.MyLocationStyle
 import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.dooze.djibox.databinding.ActivityControllerBinding
+import com.dooze.djibox.events.HotPointMissionEvent
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.internal.controller.MainActivity
 import com.dooze.djibox.internal.utils.ToastUtils
 import com.dooze.djibox.internal.view.MainContent
@@ -39,6 +41,7 @@ import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
 import com.dooze.djibox.widgets.GimbalAdjustView
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.otto.Subscribe
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
 import dji.common.useraccount.UserAccountState
@@ -48,6 +51,7 @@ import dji.log.DJILog
 import dji.sdk.base.BaseComponent
 import dji.sdk.base.BaseProduct
 import dji.sdk.base.BaseProduct.ComponentKey
+import dji.sdk.mission.MissionControl
 import dji.sdk.sdkmanager.DJISDKInitEvent
 import dji.sdk.sdkmanager.DJISDKManager
 import dji.sdk.sdkmanager.DJISDKManager.SDKManagerCallback
@@ -76,11 +80,22 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     private val groundMissionHelper = GroundMissionHelper()
     private val rtkHelper = RTKHelper()
 
+    private val missionControl by lazy {
+        MissionControl.getInstance().apply {
+            addListener { timelineElement, timelineEvent, djiError ->
+                showSnack(
+                    "Timeline Update $timelineEvent (${djiError?.description}:${djiError?.errorCode})"
+                )
+            }
+        }
+    }
+
     private var gimbalAdjustView: GimbalAdjustView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_controller)
+        App.getEventBus().register(this)
         binding = ActivityControllerBinding.bind(findViewById(R.id.rootDrawer))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(
@@ -340,8 +355,29 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         binding.mapView.onPause()
     }
 
+
+    @Subscribe
+    fun onHotPointTimelineSetup(event: HotPointMissionEvent) {
+        val error = missionControl.scheduleElements(event.elements)
+        if (error != null && error.errorCode != 0) {
+            binding.root.showSnack(
+                getString(
+                    R.string.hot_pooint_execution_error,
+                    "Fallback2:${error.description}(${error.errorCode})"
+                )
+            )
+        } else {
+            supportFragmentManager.fragments.find { it is HotPointConfigFragment }?.let {
+                supportFragmentManager.beginTransaction()
+                    .remove(it)
+                    .commit()
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        App.getEventBus().unregister(this)
         binding.mapView.onDestroy()
         locationClient?.stopLocation()
         locationClient?.onDestroy()

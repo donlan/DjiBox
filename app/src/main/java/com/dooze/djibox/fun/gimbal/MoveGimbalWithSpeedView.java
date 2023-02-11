@@ -2,7 +2,7 @@ package com.dooze.djibox.fun.gimbal;
 
 import android.content.Context;
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import dji.common.error.DJIError;
@@ -65,7 +65,7 @@ public class MoveGimbalWithSpeedView extends BaseThreeBtnView {
         }
 
         if (ModuleVerificationUtil.isGimbalModuleAvailable()) {
-            DJISampleApplication.getProductInstance().getGimbal().
+            App.getProductInstance().getGimbal().
                 rotate(null, new CommonCallbacks.CompletionCallback() {
 
                     @Override
@@ -114,7 +114,7 @@ public class MoveGimbalWithSpeedView extends BaseThreeBtnView {
         @Override
         public void run() {
             if (ModuleVerificationUtil.isGimbalModuleAvailable()) {
-                DJISampleApplication.getProductInstance().getGimbal().
+                App.getProductInstance().getGimbal().
                     rotate(new Rotation.Builder().pitch(pitchValue)
                                                  .mode(RotationMode.SPEED)
                                                  .yaw(Rotation.NO_ROTATION)

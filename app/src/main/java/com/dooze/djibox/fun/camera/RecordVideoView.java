@@ -3,7 +3,7 @@ package com.dooze.djibox.fun.camera;
 import android.content.Context;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
@@ -38,12 +38,12 @@ public class RecordVideoView extends BaseThreeBtnView {
             return;
         }
         if (ModuleVerificationUtil.isMavicAir2()){
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setFlatMode(SettingsDefinitions.FlatCameraMode.VIDEO_NORMAL, djiError -> ToastUtils.setResultToToast("SetCameraMode to recordVideo"));
             return;
         }
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .getCamera()
                 .setMode(SettingsDefinitions.CameraMode.RECORD_VIDEO, djiError -> ToastUtils.setResultToToast("SetCameraMode to recordVideo"));
     }
@@ -57,12 +57,12 @@ public class RecordVideoView extends BaseThreeBtnView {
         }
 
         if (ModuleVerificationUtil.isMavicAir2()){
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .setFlatMode(SettingsDefinitions.FlatCameraMode.PHOTO_SINGLE, djiError -> ToastUtils.setResultToToast("SetCameraMode to shootPhoto"));
             return;
         }
-        DJISampleApplication.getProductInstance()
+        App.getProductInstance()
                 .getCamera()
                 .setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, djiError -> ToastUtils.setResultToToast("SetCameraMode to shootPhoto"));
 
@@ -93,7 +93,7 @@ public class RecordVideoView extends BaseThreeBtnView {
 
         changeDescription("00:00:00");
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .startRecordVideo(djiError -> {
                         //success so, start recording
@@ -123,7 +123,7 @@ public class RecordVideoView extends BaseThreeBtnView {
     protected void handleRightBtnClick() {
 
         if (ModuleVerificationUtil.isCameraModuleAvailable()) {
-            DJISampleApplication.getProductInstance()
+            App.getProductInstance()
                     .getCamera()
                     .stopRecordVideo(djiError -> {
                         ToastUtils.setResultToToast("StopRecord");

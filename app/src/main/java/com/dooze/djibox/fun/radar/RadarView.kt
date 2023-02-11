@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.dji.frame.util.V_JsonUtil
 import com.dooze.djibox.R
-import com.dooze.djibox.internal.controller.DJISampleApplication
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.internal.utils.ViewHelper
 import com.dooze.djibox.internal.utils.PopupUtils
 import com.dooze.djibox.internal.utils.ToastUtils
@@ -46,7 +46,7 @@ class RadarView(context: Context?) : LinearLayout(context), PresentableView, Vie
     }
 
     private fun initRadar() {
-        val product = DJISampleApplication.getProductInstance();
+        val product = App.getProductInstance();
         if (product != null && product is Aircraft && product.radar != null) {
             mRadar = product.radar as Radar
         }

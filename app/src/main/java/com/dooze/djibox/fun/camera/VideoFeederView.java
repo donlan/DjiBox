@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.dooze.djibox.R;
 import com.dooze.djibox.internal.PickerValueChangeListener;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.controller.MainActivity;
 import com.dooze.djibox.internal.utils.Helper;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -627,12 +627,12 @@ public class VideoFeederView extends LinearLayout
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestStartFullScreenEvent());
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        DJISampleApplication.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
+        App.getEventBus().post(new MainActivity.RequestEndFullScreenEvent());
         tearDownListeners();
         super.onDetachedFromWindow();
     }

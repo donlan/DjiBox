@@ -17,7 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.Helper;
 import com.dooze.djibox.internal.utils.PopupUtils;
 import com.dooze.djibox.internal.utils.ToastUtils;
@@ -169,7 +169,7 @@ public class LookAtMissionView extends LinearLayout implements View.OnClickListe
             String laserInfo = "Laser information: \n" + laserInformation;
             ToastUtils.setResultToText(laserInfoTv, laserInfo);
         };
-        Camera curCamera = DJISampleApplication.getProductInstance().getCamera();
+        Camera curCamera = App.getProductInstance().getCamera();
         if (curCamera != null) {
             curCamera.setCameraVideoStreamSourceCallback(videoStreamSourceCallback);
             if (curCamera.getLens(0) != null) {

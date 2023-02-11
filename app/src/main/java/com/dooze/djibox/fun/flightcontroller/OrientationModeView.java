@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.dooze.djibox.R;
-import com.dooze.djibox.internal.controller.DJISampleApplication;
+import com.dooze.djibox.internal.controller.App;
 import com.dooze.djibox.internal.utils.ModuleVerificationUtil;
 import com.dooze.djibox.internal.utils.ToastUtils;
 import com.dooze.djibox.internal.view.BaseThreeBtnView;
@@ -36,7 +36,7 @@ public class OrientationModeView extends BaseThreeBtnView {
         super.onAttachedToWindow();
 
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-            flightController = DJISampleApplication.getAircraftInstance().getFlightController();
+            flightController = App.getAircraftInstance().getFlightController();
 
             flightController.setStateCallback(new FlightControllerState.Callback() {
                 @Override
@@ -54,7 +54,7 @@ public class OrientationModeView extends BaseThreeBtnView {
         super.onDetachedFromWindow();
 
         if(ModuleVerificationUtil.isFlightControllerAvailable()) {
-            flightController = DJISampleApplication.getAircraftInstance().getFlightController();
+            flightController = App.getAircraftInstance().getFlightController();
             flightController.setStateCallback(null);
         }
     }
@@ -82,7 +82,7 @@ public class OrientationModeView extends BaseThreeBtnView {
     @Override
     protected void handleMiddleBtnClick() {
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-            flightController = DJISampleApplication.getAircraftInstance().getFlightController();
+            flightController = App.getAircraftInstance().getFlightController();
 
             flightController.setFlightOrientationMode(FlightOrientationMode.HOME_LOCK,
                                                       new CommonCallbacks.CompletionCallback() {
@@ -99,7 +99,7 @@ public class OrientationModeView extends BaseThreeBtnView {
     @Override
     protected void handleLeftBtnClick() {
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-            flightController = DJISampleApplication.getAircraftInstance().getFlightController();
+            flightController = App.getAircraftInstance().getFlightController();
 
             flightController.setFlightOrientationMode(FlightOrientationMode.COURSE_LOCK,
                                                       new CommonCallbacks.CompletionCallback() {
@@ -116,7 +116,7 @@ public class OrientationModeView extends BaseThreeBtnView {
     @Override
     protected void handleRightBtnClick() {
         if (ModuleVerificationUtil.isFlightControllerAvailable()) {
-            flightController = DJISampleApplication.getAircraftInstance().getFlightController();
+            flightController = App.getAircraftInstance().getFlightController();
 
             flightController.setFlightOrientationMode(FlightOrientationMode.AIRCRAFT_HEADING,
                                                       new CommonCallbacks.CompletionCallback() {
