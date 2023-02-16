@@ -27,7 +27,7 @@ class MapConvertUtils {
 
 
         fun isValidPoint(lat: Double, lng: Double): Boolean {
-            return !(lat < -90.0 || lat > 90.0 || lng < -90.0 || lng > 90.0)
+            return !(lat < -90.0 || lat > 90.0 || lng < -180.0 || lng > 180.0)
         }
 
         // WGS84=》GCJ02   地球坐标系=>火星坐标系
