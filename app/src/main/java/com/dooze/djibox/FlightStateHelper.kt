@@ -15,6 +15,7 @@ import com.dooze.djibox.extensions.mapTo
 import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.map.point
 import com.dooze.djibox.utils.MapConvertUtils
+import dji.common.error.DJIError
 import dji.common.flightcontroller.RTKState
 import dji.sdk.flightcontroller.FlightController
 import dji.sdk.products.Aircraft
@@ -53,7 +54,7 @@ class FlightStateHelper {
                     distanceToHomePoint:${distanceToHomePoint}
                     Home Loc:${homePointLocation?.latitude},${homePointLocation?.longitude}
                     """.trimIndent()
-                Log.i("DjiBox", info)
+               // Log.i("DjiBox", info)
                 if (!MapConvertUtils.isValidPoint(
                         fusionMobileStationLocation.latitude,
                         fusionMobileStationLocation.longitude
@@ -152,6 +153,12 @@ class FlightStateHelper {
             }
         } else {
             mapView.showSnack(context.getString(R.string.flight_not_connected))
+        }
+    }
+
+    fun takeOff(done:(djiError:DJIError?) -> Unit) {
+        flightController?.startTakeoff {
+            done.invoke(it)
         }
     }
 }

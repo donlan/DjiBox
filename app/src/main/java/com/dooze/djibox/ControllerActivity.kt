@@ -29,6 +29,7 @@ import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.MyLocationStyle
 import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.dooze.djibox.databinding.ActivityControllerBinding
+import com.dooze.djibox.events.HotPointMissionConfigEvent
 import com.dooze.djibox.events.HotPointMissionEvent
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.showSnack
@@ -44,6 +45,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.squareup.otto.Subscribe
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
+import dji.common.mission.hotpoint.HotpointMission
 import dji.common.useraccount.UserAccountState
 import dji.common.util.CommonCallbacks.CompletionCallback
 import dji.common.util.CommonCallbacks.CompletionCallbackWith
@@ -53,6 +55,7 @@ import dji.sdk.base.BaseProduct
 import dji.sdk.base.BaseProduct.ComponentKey
 import dji.sdk.mission.MissionControl
 import dji.sdk.mission.MissionControl.Listener
+import dji.sdk.mission.hotpoint.HotpointMissionOperator
 import dji.sdk.mission.timeline.TimelineElement
 import dji.sdk.mission.timeline.TimelineEvent
 import dji.sdk.sdkmanager.DJISDKInitEvent
@@ -88,6 +91,8 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
             "Timeline Update $timelineEvent (${djiError?.description}:${djiError?.errorCode})"
         )
     }
+
+    private var hotpointMissionOperator:HotpointMissionOperator? = null
 
     private val missionControl by lazy {
         MissionControl.getInstance()
@@ -379,6 +384,36 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 supportFragmentManager.beginTransaction()
                     .remove(it)
                     .commit()
+            }
+        }
+    }
+
+
+
+    @Subscribe
+    fun onHotpotMissionConfigEvent(event: HotPointMissionConfigEvent) {
+        flightStateHelper.takeOff {
+            it?.let {
+               showSnack("Take off error. ${it.errorCode}:${it.description}")
+            }
+            startHotpointMission(event.mission)
+        }
+    }
+
+    private fun startHotpointMission(mission: HotpointMission) {
+        val operator = hotpointMissionOperator
+            ?: DJISDKManager.getInstance().missionControl.hotpointMissionOperator.also {
+                hotpointMissionOperator = it
+               // it.addListener(this)
+            }
+        operator.startMission(mission) {
+            if (it != null) {
+                binding.root.showSnack(
+                    getString(
+                        R.string.hot_pooint_start_mission_error,
+                        "${it.description}(${it.errorCode})"
+                    )
+                )
             }
         }
     }
