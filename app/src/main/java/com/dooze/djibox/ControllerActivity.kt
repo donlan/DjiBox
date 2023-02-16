@@ -52,6 +52,9 @@ import dji.sdk.base.BaseComponent
 import dji.sdk.base.BaseProduct
 import dji.sdk.base.BaseProduct.ComponentKey
 import dji.sdk.mission.MissionControl
+import dji.sdk.mission.MissionControl.Listener
+import dji.sdk.mission.timeline.TimelineElement
+import dji.sdk.mission.timeline.TimelineEvent
 import dji.sdk.sdkmanager.DJISDKInitEvent
 import dji.sdk.sdkmanager.DJISDKManager
 import dji.sdk.sdkmanager.DJISDKManager.SDKManagerCallback
@@ -80,14 +83,14 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     private val groundMissionHelper = GroundMissionHelper()
     private val rtkHelper = RTKHelper()
 
+    private val missionListener = Listener { timelineElement, timelineEvent, djiError ->
+        showSnack(
+            "Timeline Update $timelineEvent (${djiError?.description}:${djiError?.errorCode})"
+        )
+    }
+
     private val missionControl by lazy {
-        MissionControl.getInstance().apply {
-            addListener { timelineElement, timelineEvent, djiError ->
-                showSnack(
-                    "Timeline Update $timelineEvent (${djiError?.description}:${djiError?.errorCode})"
-                )
-            }
-        }
+        MissionControl.getInstance()
     }
 
     private var gimbalAdjustView: GimbalAdjustView? = null
@@ -137,7 +140,6 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 width = resources.displayMetrics.heightPixels
             }
         }
-        binding.mapView.onCreate(savedInstanceState)
         binding.tvFunHotPoint.setOnClickListener(this)
         binding.tvFunWayPoint.setOnClickListener(this)
         binding.tvFunMediaManager.setOnClickListener(this)
@@ -358,7 +360,13 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
     @Subscribe
     fun onHotPointTimelineSetup(event: HotPointMissionEvent) {
+        Log.i("DjiBox", "missionControl.scheduledCount ${missionControl.scheduledCount()}")
+        if (missionControl.scheduledCount() > 0) {
+            missionControl.unscheduleEverything()
+            missionControl.removeAllListeners()
+        }
         val error = missionControl.scheduleElements(event.elements)
+        missionControl.addListener(missionListener)
         if (error != null && error.errorCode != 0) {
             binding.root.showSnack(
                 getString(

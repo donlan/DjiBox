@@ -1,5 +1,6 @@
 package com.dooze.djibox
 
+import android.util.Log
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -41,11 +42,35 @@ class FlightStateHelper {
         set(value) {
             field = value
             value?.run {
+                val info = """
+                    Positioning solution: ${rtkState!!.positioningSolution.name}
+                    is RTK being used: ${rtkState!!.isRTKBeingUsed}
+                    Fusion latitude: ${rtkState!!.fusionMobileStationLocation.latitude}
+                    Fusion longitude: ${rtkState!!.fusionMobileStationLocation.longitude}
+                    Fusion altitude: ${rtkState!!.fusionMobileStationAltitude}
+                    Heading valid: ${rtkState!!.isHeadingValid}
+                    Fusion heading: ${rtkState!!.fusionHeading}
+                    distanceToHomePoint:${distanceToHomePoint}
+                    Home Loc:${homePointLocation?.latitude},${homePointLocation?.longitude}
+                    """.trimIndent()
+                Log.i("DjiBox", info)
+                if (!MapConvertUtils.isValidPoint(
+                        fusionMobileStationLocation.latitude,
+                        fusionMobileStationLocation.longitude
+                    )
+                ) {
+                    Log.d("DjiBox", "invalid point")
+                    return
+                }
                 updateUIState(
                     fusionMobileStationLocation.latitude,
                     fusionMobileStationLocation.longitude,
                     homePointLocation?.mapTo {
-                        MapConvertUtils.WGS2GCJ(this.latitude, this.longitude)
+                        if (MapConvertUtils.isValidPoint(this.latitude, this.longitude)) {
+                            MapConvertUtils.WGS2GCJ(this.latitude, this.longitude)
+                        } else {
+                            null
+                        }
                     },
                     heading
                 )

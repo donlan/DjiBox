@@ -1,6 +1,7 @@
 package com.dooze.djibox.extensions
 
 import android.app.Activity
+import android.util.Log
 import android.view.View
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -20,10 +21,12 @@ fun View.showSnack(@StringRes resId: Int, duration: Int = BaseTransientBottomBar
 }
 
 fun View.showSnack(text: CharSequence, duration: Int = BaseTransientBottomBar.LENGTH_SHORT) {
+    Log.i("DjiBox", text.toString())
     Snackbar.make(this, text, duration).show()
 }
 
 fun Activity.showSnack(text: CharSequence, duration: Int = BaseTransientBottomBar.LENGTH_SHORT) {
+    Log.i("DjiBox", text.toString())
     window.decorView.let { view ->
         Snackbar.make(view, text, duration).show()
     }
