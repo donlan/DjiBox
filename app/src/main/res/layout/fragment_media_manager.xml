@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
 
-    <com.dooze.djibox.fun.camera.MediaPlaybackView
+    <com.dooze.djibox.fun.camera.FetchMediaView
         android:id="@+id/mediaPlaybackView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

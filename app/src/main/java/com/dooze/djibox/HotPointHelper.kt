@@ -125,6 +125,7 @@ class HotPointHelper : IPickPointMarker {
 
 
                     }
+                    onProgressChanged?.invoke(progress)
                 })
                 onOkClick = {
                     isStartedPick = false

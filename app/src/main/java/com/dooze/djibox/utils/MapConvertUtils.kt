@@ -25,6 +25,11 @@ class MapConvertUtils {
         private const val AXIS = 6378245.0 //轴
         private const val OFFSET = 0.00669342162296594323 //偏移量 (a^2 - b^2) / a^2
 
+
+        fun isValidPoint(lat: Double, lng: Double): Boolean {
+            return !(lat < -90.0 || lat > 90.0 || lng < -90.0 || lng > 90.0)
+        }
+
         // WGS84=》GCJ02   地球坐标系=>火星坐标系
         fun wgs2GCJ(wgLat: Double, wgLon: Double): DoubleArray {
             val latlon = DoubleArray(2)

@@ -46,8 +46,6 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
         FragmentHotPointConfigBinding.bind(requireView())
     }
 
-    private var hotPointOperator: HotpointMissionOperator? = null
-
     private val point: LatLng by lazyFast { requireArguments().getParcelable("point")!! }
     private val radius by lazyFast { requireArguments().getDouble("radius") }
 
@@ -59,6 +57,10 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
         binding.ivClose.roundedCorner(-1)
         binding.ivClose.setOnClickListener(this)
         binding.ibDone.setOnClickListener(this)
+        binding.ibDone.setOnLongClickListener {
+            fallback2(createMission())
+            true
+        }
         requireArguments().getString("title")?.let {
             binding.tvHint.text = it
         }
@@ -98,29 +100,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                 dismiss()
             }
             R.id.ibDone -> {
-
-                val mission = HotpointMission().apply {
-                    this.hotpoint = LocationCoordinate2D(point.latitude, point.longitude)
-                    this.radius = this@HotPointConfigFragment.radius
-                    this.altitude = binding.etAltitude.text.toString().toDoubleOrNull() ?: 0.0
-                    this.heading = when (binding.rgHeading.checkedRadioButtonId) {
-                        R.id.headingLookingForward -> HotpointHeading.ALONG_CIRCLE_LOOKING_FORWARDS
-                        R.id.headingLookingBackward -> HotpointHeading.ALONG_CIRCLE_LOOKING_BACKWARDS
-                        R.id.headingTowardHotPoint -> HotpointHeading.TOWARDS_HOT_POINT
-                        R.id.headingAwayFromHotPoint -> HotpointHeading.AWAY_FROM_HOT_POINT
-                        R.id.headingRemoteController -> HotpointHeading.CONTROLLED_BY_REMOTE_CONTROLLER
-                        else -> HotpointHeading.USING_INITIAL_HEADING
-                    }
-                    this.angularVelocity = binding.speedSeekBar.progress.toFloat()
-                    this.isClockwise = binding.switchClockwise.isChecked
-                    this.startPoint = when (binding.rgStartPoint.checkedRadioButtonId) {
-                        R.id.startPointEast -> HotpointStartPoint.EAST
-                        R.id.startPointNorth -> HotpointStartPoint.NORTH
-                        R.id.startPointSouth -> HotpointStartPoint.SOUTH
-                        R.id.startPointWest -> HotpointStartPoint.WEST
-                        else -> HotpointStartPoint.NEAREST
-                    }
-                }
+                val mission = createMission()
                 val error = mission.checkParameters()
                 if (error != null) {
                     requireActivity().showSnack(
@@ -142,6 +122,31 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                 elements.add(HotpointAction(mission, 360f))
                 elements.add(GoHomeAction())
                 App.getEventBus().post(HotPointMissionEvent(elements))
+            }
+        }
+    }
+
+    private fun createMission(): HotpointMission {
+        return HotpointMission().apply {
+            this.hotpoint = LocationCoordinate2D(point.latitude, point.longitude)
+            this.radius = this@HotPointConfigFragment.radius
+            this.altitude = binding.etAltitude.text.toString().toDoubleOrNull() ?: 0.0
+            this.heading = when (binding.rgHeading.checkedRadioButtonId) {
+                R.id.headingLookingForward -> HotpointHeading.ALONG_CIRCLE_LOOKING_FORWARDS
+                R.id.headingLookingBackward -> HotpointHeading.ALONG_CIRCLE_LOOKING_BACKWARDS
+                R.id.headingTowardHotPoint -> HotpointHeading.TOWARDS_HOT_POINT
+                R.id.headingAwayFromHotPoint -> HotpointHeading.AWAY_FROM_HOT_POINT
+                R.id.headingRemoteController -> HotpointHeading.CONTROLLED_BY_REMOTE_CONTROLLER
+                else -> HotpointHeading.USING_INITIAL_HEADING
+            }
+            this.angularVelocity = binding.speedSeekBar.progress.toFloat()
+            this.isClockwise = binding.switchClockwise.isChecked
+            this.startPoint = when (binding.rgStartPoint.checkedRadioButtonId) {
+                R.id.startPointEast -> HotpointStartPoint.EAST
+                R.id.startPointNorth -> HotpointStartPoint.NORTH
+                R.id.startPointSouth -> HotpointStartPoint.SOUTH
+                R.id.startPointWest -> HotpointStartPoint.WEST
+                else -> HotpointStartPoint.NEAREST
             }
         }
     }
@@ -191,8 +196,8 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
         val heading = HotpointHeading.TOWARDS_HOT_POINT
         hotpointMission.heading = heading
         elements.add(HotpointAction(hotpointMission, 360f))
-        missionControl.addListener(this)
         val error = missionControl.scheduleElements(elements)
+        missionControl.addListener(this)
         if (error != null && error.errorCode != 0) {
             binding.root.showSnack(
                 getString(
@@ -200,7 +205,9 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     "Fallback2:${error.description}(${error.errorCode})"
                 )
             )
+            return
         }
+        dismiss()
     }
 
     override fun onExecutionUpdate(p0: HotpointMissionEvent) {
