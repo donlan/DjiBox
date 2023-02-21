@@ -10,4 +10,8 @@ import dji.sdk.mission.timeline.TimelineElement
  * @lastModifyDate: 2023/2/11 14:44
  * @description:
  */
-data class HotPointMissionConfigEvent(val mission:HotpointMission)
+data class HotPointMissionConfigEvent(
+    val mission: HotpointMission,
+    val takePhotoCount: Int = 10,
+    val takePhotoByApi:Boolean
+)
