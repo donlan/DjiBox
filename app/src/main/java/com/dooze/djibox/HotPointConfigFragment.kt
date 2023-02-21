@@ -3,6 +3,7 @@ package com.dooze.djibox
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps.model.LatLng
@@ -59,11 +60,30 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.shotModeSwitcher.setOnClickListener {
+            binding.shotModeSwitcher.toggleChecked()
+        }
+        binding.etShotCount.doAfterTextChanged {
+            kotlin.runCatching {
+                val c = it.toString().toInt()
+                val len = radius * Math.PI * 2
+                val v = binding.speedSeekBar.progress
+                val timeSec = len / v
+                binding.tvShootCount.text = buildString {
+                    append(getString(R.string.hotpoint_shot_count))
+                    append("(总飞行")
+                    append(timeSec.toInt())
+                    append("秒,")
+                    append("每${(timeSec / c).toInt()}秒拍照一次）")
+                }
+            }
+        }
+        binding.etShotCount.setText("10")
         binding.ivClose.roundedCorner(-1)
         binding.ivClose.setOnClickListener(this)
         binding.ibDone.setOnClickListener(this)
         binding.ibDone.setOnLongClickListener {
-           // fallback2(createMission())
+            // fallback2(createMission())
             true
         }
         requireArguments().getString("title")?.let {
@@ -104,6 +124,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                 App.getEventBus().post(ResetHotPoint)
                 dismiss()
             }
+
             R.id.ibDone -> {
 
                 val mission = HotpointMission().apply {
@@ -143,7 +164,13 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     dismiss()
                     return
                 }
-                App.getEventBus().post(HotPointMissionConfigEvent(mission))
+                App.getEventBus().post(
+                    HotPointMissionConfigEvent(
+                        mission,
+                        binding.etShotCount.text.toString().toInt(),
+                        binding.shotModeSwitcher.isChecked
+                    )
+                )
                 dismiss()
             }
         }

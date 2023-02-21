@@ -5,14 +5,35 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps.MapView
-import com.amap.api.maps.model.*
+import com.amap.api.maps.model.BitmapDescriptorFactory
+import com.amap.api.maps.model.Circle
+import com.amap.api.maps.model.CircleOptions
+import com.amap.api.maps.model.LatLng
+import com.amap.api.maps.model.Marker
+import com.amap.api.maps.model.MarkerOptions
+import com.dooze.djibox.events.HotPointMissionConfigEvent
 import com.dooze.djibox.extensions.mapTo
+import com.dooze.djibox.extensions.message
+import com.dooze.djibox.extensions.showSnack
 import com.dooze.djibox.internal.controller.App
+import com.dooze.djibox.internal.utils.ModuleVerificationUtil
+import com.dooze.djibox.internal.utils.ToastUtils
 import com.dooze.djibox.map.IPickPointMarker
 import com.dooze.djibox.utils.toDJILocation
-import com.dooze.djibox.widgets.*
+import com.dooze.djibox.widgets.ActionView
+import com.dooze.djibox.widgets.AppAlert
+import com.dooze.djibox.widgets.SeekbarText
+import com.dooze.djibox.widgets.cancelAction
+import com.dooze.djibox.widgets.startAction
 import com.squareup.otto.Subscribe
+import dji.common.camera.SettingsDefinitions
+import dji.common.error.DJIError
+import dji.common.util.CommonCallbacks
+import dji.waypointv2.natives.util.NativeCallbackUtils.CommonCallback
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pdb.app.base.extensions.dp
 import pdb.app.base.extensions.dpInt
 import pdb.app.base.extensions.removeFromParent
@@ -149,6 +170,66 @@ class HotPointHelper : IPickPointMarker {
             .add(R.id.fragment_container, configFragment)
             .show(configFragment)
             .commit()
+    }
+
+    fun startCapture(event: HotPointMissionConfigEvent, takePhotoAction: () -> Unit) {
+        val ac = activity ?: return
+        val mission = event.mission
+        val len = mission.radius * Math.PI * 2
+        val v = mission.angularVelocity
+        val timeSec = len / v
+        val intervalToTake = timeSec / event.takePhotoCount
+        ac.showSnack("开始拍照：飞行距离：$len,角速度：$v,时长：$timeSec, 拍照数量：${event.takePhotoCount}($intervalToTake)")
+        ac.lifecycleScope.launch {
+            kotlin.runCatching {
+                if (event.takePhotoByApi) {
+                    val camera = App.getAircraftInstance().camera
+                    if (ModuleVerificationUtil.isMatrice300RTK() || ModuleVerificationUtil.isMavicAir2()) {
+                        camera.setFlatMode(
+                            SettingsDefinitions.FlatCameraMode.PHOTO_SINGLE
+                        ) { djiError: DJIError? ->
+                            if (djiError != null) {
+                                ac.showSnack("拍照失败：${djiError.message}")
+                            }
+                        }
+                    } else {
+                        camera.setMode(
+                            SettingsDefinitions.CameraMode.SHOOT_PHOTO
+                        ) { djiError: DJIError? ->
+                            if (djiError != null) {
+                                ac.showSnack("拍照失败：${djiError.message}")
+                            }
+                        }
+                    }
+                    camera.setShootPhotoMode(
+                        SettingsDefinitions.ShootPhotoMode.INTERVAL
+                    ) {
+                        ac.showSnack("setShootPhotoMode：${it.message}")
+                    }
+                    delay(100L)
+                    camera.setPhotoTimeIntervalSettings(
+                        SettingsDefinitions.PhotoTimeIntervalSettings(
+                            event.takePhotoCount,
+                            intervalToTake.toInt()
+                        )
+                    ) {
+                        ac.showSnack("setPhotoTimeIntervalSettings：${it.message}")
+                    }
+                    delay(100L)
+                    camera.setMediaFileCallback {
+                        ac.showSnack("setMediaFileCallback ${it.fileName}")
+                    }
+                    return@launch
+                }
+                var times = event.takePhotoCount
+                while (times > 0) {
+                    takePhotoAction.invoke()
+                    ac.showSnack("Take Photo action:${event.takePhotoCount - times}")
+                    delay(intervalToTake.toLong())
+                    --times
+                }
+            }
+        }
     }
 
 

@@ -1,7 +1,6 @@
 package com.dooze.djibox
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -13,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
@@ -25,19 +23,18 @@ import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.maps.AMap
 import com.amap.api.maps.model.BitmapDescriptorFactory
-import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.MyLocationStyle
 import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.dooze.djibox.databinding.ActivityControllerBinding
 import com.dooze.djibox.events.HotPointMissionConfigEvent
 import com.dooze.djibox.events.HotPointMissionEvent
 import com.dooze.djibox.extensions.makeVibrate
+import com.dooze.djibox.extensions.message
 import com.dooze.djibox.extensions.showSnack
 import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.internal.controller.MainActivity
 import com.dooze.djibox.internal.utils.ToastUtils
 import com.dooze.djibox.internal.view.MainContent
-import com.dooze.djibox.map.PickLocationActivity
 import com.dooze.djibox.map.point
 import com.dooze.djibox.map.zoomTo
 import com.dooze.djibox.widgets.GimbalAdjustView
@@ -45,9 +42,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.squareup.otto.Subscribe
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
-import dji.common.mission.hotpoint.HotpointMission
+import dji.common.mission.hotpoint.HotpointMissionEvent
 import dji.common.useraccount.UserAccountState
-import dji.common.util.CommonCallbacks.CompletionCallback
 import dji.common.util.CommonCallbacks.CompletionCallbackWith
 import dji.log.DJILog
 import dji.sdk.base.BaseComponent
@@ -56,13 +52,12 @@ import dji.sdk.base.BaseProduct.ComponentKey
 import dji.sdk.mission.MissionControl
 import dji.sdk.mission.MissionControl.Listener
 import dji.sdk.mission.hotpoint.HotpointMissionOperator
-import dji.sdk.mission.timeline.TimelineElement
-import dji.sdk.mission.timeline.TimelineEvent
+import dji.sdk.mission.hotpoint.HotpointMissionOperatorListener
 import dji.sdk.sdkmanager.DJISDKInitEvent
 import dji.sdk.sdkmanager.DJISDKManager
 import dji.sdk.sdkmanager.DJISDKManager.SDKManagerCallback
 import dji.sdk.useraccount.UserAccountManager
-import dji.thirdparty.sanselan.formats.tiff.TiffDirectory.description
+import dji.ux.widget.controls.CameraCaptureWidget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import pdb.app.base.extensions.roundedCorner
@@ -92,7 +87,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         )
     }
 
-    private var hotpointMissionOperator:HotpointMissionOperator? = null
+    private var hotpointMissionOperator: HotpointMissionOperator? = null
 
     private val missionControl by lazy {
         MissionControl.getInstance()
@@ -343,9 +338,11 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
             UserAccountState.AUTHORIZED -> {
                 binding.tvFunUserAccount.text = getString(R.string.uesr_logined)
             }
+
             UserAccountState.NOT_AUTHORIZED, UserAccountState.TOKEN_OUT_OF_DATE -> {
                 binding.tvFunUserAccount.text = getString(R.string.user_login_invalid)
             }
+
             else -> {
                 binding.tvFunUserAccount.text = getString(R.string.fun_login)
             }
@@ -389,22 +386,32 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
-
     @Subscribe
     fun onHotpotMissionConfigEvent(event: HotPointMissionConfigEvent) {
-        flightStateHelper.takeOff {
-            it?.let {
-               showSnack("Take off error. ${it.errorCode}:${it.description}")
-            }
-            startHotpointMission(event.mission)
-        }
+        startHotpointMission(event)
     }
 
-    private fun startHotpointMission(mission: HotpointMission) {
+    private fun startHotpointMission(event: HotPointMissionConfigEvent) {
+        val mission = event.mission
         val operator = hotpointMissionOperator
-            ?: DJISDKManager.getInstance().missionControl.hotpointMissionOperator.also {
-                hotpointMissionOperator = it
-               // it.addListener(this)
+            ?: DJISDKManager.getInstance().missionControl.hotpointMissionOperator.also { missionOperator ->
+                hotpointMissionOperator = missionOperator
+                missionOperator.addListener(object : HotpointMissionOperatorListener {
+                    override fun onExecutionUpdate(p0: HotpointMissionEvent) {
+                    }
+
+                    override fun onExecutionStart() {
+                        hotPointHelper.startCapture(event) {
+                            binding.CameraCapturePanel.children.find { it is CameraCaptureWidget }
+                                ?.performClick()
+                        }
+                    }
+
+                    override fun onExecutionFinish(p0: DJIError?) {
+                        showSnack("HotPoint onExecutionFinish ${p0?.message}")
+                    }
+
+                })
             }
         operator.startMission(mission) {
             if (it != null) {
@@ -438,6 +445,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 //pickLocation.launch(0)
                 hotPointHelper.markStartHotPoint(this)
             }
+
             R.id.tvFunWayPoint -> {
                 closeDrawer()
 //                startActivity(
@@ -448,26 +456,32 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 //                )
                 wayPointHelper.markStartWapPoint()
             }
+
             R.id.tvFunMediaManager -> {
                 closeDrawer()
                 showFragment(MediaManagerFragment())
             }
+
             R.id.tvFunGroundMission -> {
                 closeDrawer()
                 groundMissionHelper.markStartWapPoint()
             }
+
             R.id.tvFunGimbalAdjust -> {
                 closeDrawer()
                 showGimbalAdjust()
             }
+
             R.id.ibFpvMapLayer -> {
                 changeMapViewMode(!binding.mapView.isVisible)
             }
+
             R.id.ivMyLocation -> {
                 locationClient?.lastKnownLocation?.let {
                     binding.mapView.zoomTo(it.point, 17f)
                 }
             }
+
             R.id.ivLayer -> {
                 PopupMenu(this, p0, Gravity.TOP).apply {
                     this.menuInflater.inflate(R.menu.map_layer_menu, menu)
@@ -476,9 +490,11 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                             R.id.mayLayerNavi -> {
                                 AMap.MAP_TYPE_NAVI
                             }
+
                             R.id.mayLayerSatellite -> {
                                 AMap.MAP_TYPE_SATELLITE
                             }
+
                             else -> {
                                 AMap.MAP_TYPE_NORMAL
                             }
@@ -491,10 +507,12 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }.show()
             }
+
             R.id.tvFunOfflineMap -> {
                 binding.rootDrawer.closeDrawer(Gravity.LEFT)
                 startActivity(Intent(this, OfflineMapActivity::class.java))
             }
+
             R.id.rtkSwitcher -> {
                 binding.rtkSwitcher.toggleChecked()
                 if (binding.rtkSwitcher.isChecked) {
@@ -513,6 +531,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                     flightStateHelper.rtkState = null
                 }
             }
+
             R.id.tvFunUserAccount -> {
                 when (UserAccountManager.getInstance().userAccountState) {
                     UserAccountState.AUTHORIZED -> {
@@ -534,6 +553,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                             }
                         }.show()
                     }
+
                     else -> {
                         UserAccountManager.getInstance().logIntoDJIUserAccount(
                             this,

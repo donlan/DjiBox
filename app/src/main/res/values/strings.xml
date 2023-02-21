@@ -465,5 +465,7 @@
     <string name="fun_login_out_confirm">是否退出登录？</string>
     <string name="fun_login_out_error">退出登录失败。%1$s</string>
     <string name="fun_login_in_error">登录失败。%1$s</string>
+    <string name="hotpoint_shot_count">拍照数量</string>
+    <string name="hotpoint_shot_Mode">拍照模式（选中用API调用）</string>
 
 </resources>

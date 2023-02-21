@@ -262,6 +262,58 @@
             </RadioGroup>
 
 
+            <TextView
+                android:id="@+id/tvShootCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/hotpoint_shot_count"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rgHeading" />
+
+            <EditText
+                android:id="@+id/etShotCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:minWidth="40dp"
+                android:text="10"
+                app:layout_constraintBottom_toBottomOf="@id/tvShootCount"
+                app:layout_constraintStart_toEndOf="@id/tvShootCount"
+                app:layout_constraintTop_toTopOf="@id/tvShootCount" />
+
+
+            <TextView
+                android:id="@+id/tvShootMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/hotpoint_shot_Mode"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvShootCount" />
+
+            <com.dooze.djibox.widgets.Switcher
+                android:id="@+id/shotModeSwitcher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:minWidth="40dp"
+                android:text="10"
+                app:layout_constraintBottom_toBottomOf="@id/tvShootMode"
+                app:layout_constraintStart_toEndOf="@id/tvShootMode"
+                app:layout_constraintTop_toTopOf="@id/tvShootMode" />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
