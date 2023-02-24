@@ -66,15 +66,14 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
         binding.etShotCount.doAfterTextChanged {
             kotlin.runCatching {
                 val c = it.toString().toInt()
-                val len = radius * Math.PI * 2
                 val v = binding.speedSeekBar.progress
-                val timeSec = len / v
+                val timeSec = 360 / v
                 binding.tvShootCount.text = buildString {
                     append(getString(R.string.hotpoint_shot_count))
                     append("(总飞行")
-                    append(timeSec.toInt())
+                    append(timeSec)
                     append("秒,")
-                    append("每${(timeSec / c).toInt()}秒拍照一次）")
+                    append("每${(timeSec / c)}秒拍照一次）")
                 }
             }
         }
@@ -115,7 +114,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
 
     private fun updateSpeedProgress() {
         val progress = binding.speedSeekBar.progress
-        binding.tvSpeedValue.text = "$progress m/s"
+        binding.tvSpeedValue.text = "$progress °/s"
     }
 
     override fun onClick(v: View?) {
