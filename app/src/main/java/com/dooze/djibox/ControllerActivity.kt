@@ -390,8 +390,9 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
     fun onHotpotMissionConfigEvent(event: HotPointMissionConfigEvent) {
         //startHotpointMission(event)
         hotPointHelper.startCapture(event) {
-            binding.CameraCapturePanel.children.find { it is CameraCaptureWidget }
-                ?.performClick()
+            (binding.CameraCapturePanel.children.find { it is CameraCaptureWidget } as CameraCaptureWidget).apply {
+                onClick(this)
+            }
         }
     }
 
