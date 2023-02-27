@@ -224,7 +224,7 @@ class HotPointHelper : IPickPointMarker {
                 while (times > 0) {
                     takePhotoAction.invoke()
                     ac.showSnack("Take Photo action:${event.takePhotoCount - times}")
-                    delay(intervalToTake.toLong())
+                    delay((intervalToTake * 1000L).toLong())
                     --times
                 }
             }
