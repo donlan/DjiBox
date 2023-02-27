@@ -175,11 +175,10 @@ class HotPointHelper : IPickPointMarker {
     fun startCapture(event: HotPointMissionConfigEvent, takePhotoAction: () -> Unit) {
         val ac = activity ?: return
         val mission = event.mission
-        val len = mission.radius * Math.PI * 2
         val v = mission.angularVelocity
-        val timeSec = len / v
+        val timeSec = 360 / v
         val intervalToTake = timeSec / event.takePhotoCount
-        ac.showSnack("开始拍照：飞行距离：$len,角速度：$v,时长：$timeSec, 拍照数量：${event.takePhotoCount}($intervalToTake)")
+        ac.showSnack("开始拍照：角速度：$v,时长：$timeSec, 拍照数量：${event.takePhotoCount}($intervalToTake)")
         ac.lifecycleScope.launch {
             kotlin.runCatching {
                 if (event.takePhotoByApi) {
