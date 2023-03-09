@@ -314,6 +314,30 @@
                 app:layout_constraintTop_toTopOf="@id/tvShootMode" />
 
 
+            <TextView
+                android:id="@+id/tvTakeOffMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/hotpoint_takeoff_Mode"
+                android:textColor="@color/textColorSecondary"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvShootMode" />
+
+            <com.dooze.djibox.widgets.Switcher
+                android:id="@+id/takeOffSwitcher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center"
+                android:inputType="number"
+                android:minWidth="40dp"
+                app:layout_constraintBottom_toBottomOf="@id/tvTakeOffMode"
+                app:layout_constraintStart_toEndOf="@id/tvTakeOffMode"
+                app:layout_constraintTop_toTopOf="@id/tvTakeOffMode" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>

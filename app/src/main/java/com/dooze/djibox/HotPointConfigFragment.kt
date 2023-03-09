@@ -167,7 +167,8 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     HotPointMissionConfigEvent(
                         mission,
                         binding.etShotCount.text.toString().toInt(),
-                        binding.shotModeSwitcher.isChecked
+                        binding.shotModeSwitcher.isChecked,
+                        binding.takeOffSwitcher.isChecked
                     )
                 )
                 dismiss()

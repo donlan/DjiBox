@@ -177,7 +177,7 @@ class HotPointHelper : IPickPointMarker {
         val mission = event.mission
         val v = mission.angularVelocity
         val timeSec = 360 / v
-        val intervalToTake = timeSec / event.takePhotoCount
+        val intervalToTake = (timeSec / event.takePhotoCount).coerceAtLeast(0.5f)
         ac.showSnack("开始拍照：角速度：$v,时长：$timeSec, 拍照数量：${event.takePhotoCount}($intervalToTake)")
         ac.lifecycleScope.launch {
             kotlin.runCatching {
