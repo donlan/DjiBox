@@ -13,5 +13,6 @@ import dji.sdk.mission.timeline.TimelineElement
 data class HotPointMissionConfigEvent(
     val mission: HotpointMission,
     val takePhotoCount: Int = 10,
-    val takePhotoByApi:Boolean
+    val takePhotoByApi: Boolean,
+    val takeOffFirst: Boolean
 )

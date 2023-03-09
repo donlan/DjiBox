@@ -43,8 +43,12 @@ import com.squareup.otto.Subscribe
 import dji.common.error.DJIError
 import dji.common.error.DJISDKError
 import dji.common.mission.hotpoint.HotpointMissionEvent
+import dji.common.mission.hotpoint.HotpointMissionState
 import dji.common.useraccount.UserAccountState
 import dji.common.util.CommonCallbacks.CompletionCallbackWith
+import dji.keysdk.FlightControllerKey
+import dji.keysdk.KeyManager
+import dji.keysdk.callback.ActionCallback
 import dji.log.DJILog
 import dji.sdk.base.BaseComponent
 import dji.sdk.base.BaseProduct
@@ -388,16 +392,33 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
     @Subscribe
     fun onHotpotMissionConfigEvent(event: HotPointMissionConfigEvent) {
-        //startHotpointMission(event)
-        hotPointHelper.startCapture(event) {
-            (binding.CameraCapturePanel.children.find { it is CameraCaptureWidget } as CameraCaptureWidget).apply {
-                onClick(this)
+        if (event.takeOffFirst) {
+            val var1 = FlightControllerKey.create("TakeOff")
+            if (KeyManager.getInstance() != null) {
+                KeyManager.getInstance().performAction(var1, object : ActionCallback {
+                    override fun onSuccess() {
+                        showSnack(getString(dji.ux.R.string.left_menu_takeoff_success))
+                        startHotpointMission(event)
+                    }
+
+                    override fun onFailure(var1: DJIError) {
+                        showSnack(getString(dji.ux.R.string.fpv_tip_cant_takeoff) + var1.message)
+                    }
+                }, *arrayOfNulls(0))
             }
+
+        } else {
+            startHotpointMission(event)
         }
     }
 
     private fun startHotpointMission(event: HotPointMissionConfigEvent) {
         val mission = event.mission
+        if (hotpointMissionOperator?.currentState == HotpointMissionState.EXECUTING) {
+            hotpointMissionOperator?.stop {
+
+            }
+        }
         val operator = hotpointMissionOperator
             ?: DJISDKManager.getInstance().missionControl.hotpointMissionOperator.also { missionOperator ->
                 hotpointMissionOperator = missionOperator
@@ -407,8 +428,9 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
                     override fun onExecutionStart() {
                         hotPointHelper.startCapture(event) {
-                            binding.CameraCapturePanel.children.find { it is CameraCaptureWidget }
-                                ?.performClick()
+                            (binding.CameraCapturePanel.children.find { it is CameraCaptureWidget } as CameraCaptureWidget).apply {
+                                onClick(this)
+                            }
                         }
                     }
 
