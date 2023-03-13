@@ -468,5 +468,6 @@
     <string name="hotpoint_shot_count">拍照数量</string>
     <string name="hotpoint_shot_Mode">拍照模式（选中用API调用）</string>
     <string name="hotpoint_takeoff_Mode">起飞后再执行热点任务</string>
+    <string name="push_info">Push Info</string>
 
 </resources>
