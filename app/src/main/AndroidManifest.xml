@@ -144,6 +144,10 @@
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".MediaManagerActivity"
+            android:exported="false" />
     </application>
 
 

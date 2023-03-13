@@ -25,4 +25,9 @@
 
     <color name="map_highlight_radius_fill">#4DFF9800</color>
     <color name="map_highlight_radius_stoker">#FF9800</color>
+
+    <color name="black_overlay">#000000</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="background_blue">#242d34</color>
+    <color name="dark_gray">#80000000</color>
 </resources>

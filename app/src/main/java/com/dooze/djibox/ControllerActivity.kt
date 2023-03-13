@@ -486,7 +486,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
             R.id.tvFunMediaManager -> {
                 closeDrawer()
-                showFragment(MediaManagerFragment())
+                startActivity(Intent(this, MediaManagerActivity::class.java))
             }
 
             R.id.tvFunGroundMission -> {
