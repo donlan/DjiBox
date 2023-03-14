@@ -15,6 +15,7 @@ import com.amap.api.maps.model.BitmapDescriptorFactory
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.Marker
 import com.amap.api.maps.model.MarkerOptions
+import com.dooze.djibox.events.HotPointMissionConfigEvent
 import com.dooze.djibox.extensions.showSnack
 import com.dooze.djibox.flow.FlowLayout
 import com.dooze.djibox.map.IPickPointMarker
