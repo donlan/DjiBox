@@ -55,7 +55,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
     private val point: LatLng by lazyFast { requireArguments().getParcelable("point")!! }
     private val radius by lazyFast { requireArguments().getDouble("radius") }
 
-    var configReceiver: ((mission: HotpointMission) -> Unit)? = null
+    var configReceiver: ((mission: HotPointMissionConfigEvent) -> Unit)? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -158,19 +158,18 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
                     )
                     return
                 }
+                val event = HotPointMissionConfigEvent(
+                    mission,
+                    binding.etShotCount.text.toString().toInt(),
+                    binding.shotModeSwitcher.isChecked,
+                    binding.takeOffSwitcher.isChecked
+                )
                 if (configReceiver != null) {
-                    configReceiver?.invoke(mission)
+                    configReceiver?.invoke(event)
                     dismiss()
                     return
                 }
-                App.getEventBus().post(
-                    HotPointMissionConfigEvent(
-                        mission,
-                        binding.etShotCount.text.toString().toInt(),
-                        binding.shotModeSwitcher.isChecked,
-                        binding.takeOffSwitcher.isChecked
-                    )
-                )
+                App.getEventBus().post(event)
                 dismiss()
             }
         }
@@ -217,7 +216,7 @@ class HotPointConfigFragment : Fragment(R.layout.fragment_hot_point_config), Vie
             point: LatLng,
             radius: Double,
             title: String? = null,
-            configReceiver: ((mission: HotpointMission) -> Unit)? = null
+            configReceiver: ((mission: HotPointMissionConfigEvent) -> Unit)? = null
         ): HotPointConfigFragment {
             val fragment = HotPointConfigFragment()
             fragment.configReceiver = configReceiver

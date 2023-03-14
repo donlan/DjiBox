@@ -30,8 +30,10 @@ import com.dooze.djibox.widgets.startAction
 import com.squareup.otto.Subscribe
 import dji.common.camera.SettingsDefinitions
 import dji.common.error.DJIError
+import dji.common.mission.hotpoint.HotpointMission
 import dji.common.util.CommonCallbacks
 import dji.waypointv2.natives.util.NativeCallbackUtils.CommonCallback
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pdb.app.base.extensions.dp
@@ -61,6 +63,8 @@ class HotPointHelper : IPickPointMarker {
     private var radiusSeekbarText: SeekbarText? = null
     private var radiusActionView: ActionView? = null
 
+    private var takePhotoJob: Job? = null
+
     fun init(mapView: MapView, activity: ControllerActivity) {
         this.mapView = mapView
         this.activity = activity
@@ -72,6 +76,7 @@ class HotPointHelper : IPickPointMarker {
         isStartedPick = false
         radiusCircle?.remove()
         hotPointMarker?.remove()
+        takePhotoJob?.cancel()
     }
 
 
@@ -179,7 +184,7 @@ class HotPointHelper : IPickPointMarker {
         val timeSec = 360 / v
         val intervalToTake = (timeSec / event.takePhotoCount).coerceAtLeast(0.5f)
         ac.showSnack("开始拍照：角速度：$v,时长：$timeSec, 拍照数量：${event.takePhotoCount}($intervalToTake)")
-        ac.lifecycleScope.launch {
+        takePhotoJob = ac.lifecycleScope.launch {
             kotlin.runCatching {
                 if (event.takePhotoByApi) {
                     val camera = App.getAircraftInstance().camera
@@ -233,3 +238,6 @@ class HotPointHelper : IPickPointMarker {
 
 
 }
+
+val HotpointMission.flyTimeSec: Float
+    get() = 360 / angularVelocity

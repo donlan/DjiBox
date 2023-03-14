@@ -26,8 +26,11 @@ import com.amap.api.maps.model.BitmapDescriptorFactory
 import com.amap.api.maps.model.MyLocationStyle
 import com.amap.api.maps.offlinemap.OfflineMapActivity
 import com.dooze.djibox.databinding.ActivityControllerBinding
+import com.dooze.djibox.events.GroundHotPointMissionConfigEvent
 import com.dooze.djibox.events.HotPointMissionConfigEvent
 import com.dooze.djibox.events.HotPointMissionEvent
+import com.dooze.djibox.events.StopHotPointEvent
+import com.dooze.djibox.events.TakePhotoEvent
 import com.dooze.djibox.extensions.makeVibrate
 import com.dooze.djibox.extensions.message
 import com.dooze.djibox.extensions.showSnack
@@ -412,7 +415,30 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun startHotpointMission(event: HotPointMissionConfigEvent) {
+    @Subscribe
+    fun onGroundHotPointConfigEvent(event: GroundHotPointMissionConfigEvent) {
+        onHotpotMissionConfigEvent(event.missions.first())
+    }
+
+    @Subscribe
+    fun onStopHotPoint(event: StopHotPointEvent) {
+        hotPointHelper.onResetHotPoint(ResetHotPoint)
+        hotpointMissionOperator?.removeAllListeners()
+        hotpointMissionOperator?.stop {
+            showSnack("Stop Hotpoint error. ${it.message}")
+        }
+    }
+
+    @Subscribe
+    fun onTakePhotoEvent(event: TakePhotoEvent) {
+        (binding.CameraCapturePanel.children.find { it is CameraCaptureWidget } as CameraCaptureWidget).apply {
+            onClick(this)
+        }
+    }
+
+    private fun startHotpointMission(
+        event: HotPointMissionConfigEvent
+    ) {
         val mission = event.mission
         if (hotpointMissionOperator?.currentState == HotpointMissionState.EXECUTING) {
             hotpointMissionOperator?.stop {
@@ -428,14 +454,15 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
 
                     override fun onExecutionStart() {
                         hotPointHelper.startCapture(event) {
-                            (binding.CameraCapturePanel.children.find { it is CameraCaptureWidget } as CameraCaptureWidget).apply {
-                                onClick(this)
-                            }
+                            onTakePhotoEvent(TakePhotoEvent())
                         }
                     }
 
                     override fun onExecutionFinish(p0: DJIError?) {
                         showSnack("HotPoint onExecutionFinish ${p0?.message}")
+                        groundMissionHelper.nextMissionEvent(event, checkCurrentJob = true)?.let {
+                            startHotpointMission(it)
+                        }
                     }
 
                 })
@@ -450,6 +477,7 @@ class ControllerActivity : AppCompatActivity(), View.OnClickListener {
                 )
             }
         }
+        groundMissionHelper.createNextMissionTimer(event)
     }
 
     override fun onDestroy() {

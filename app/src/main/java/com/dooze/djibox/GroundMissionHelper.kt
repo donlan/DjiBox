@@ -7,10 +7,15 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.lifecycleScope
 import com.amap.api.maps.MapView
 import com.amap.api.maps.model.*
+import com.dooze.djibox.events.GroundHotPointMissionConfigEvent
+import com.dooze.djibox.events.HotPointMissionConfigEvent
+import com.dooze.djibox.events.StopHotPointEvent
 import com.dooze.djibox.extensions.mapTo
 import com.dooze.djibox.extensions.showSnack
+import com.dooze.djibox.internal.controller.App
 import com.dooze.djibox.map.IPickPointMarker
 import com.dooze.djibox.utils.MapUtils
 import com.dooze.djibox.utils.toDJILocation
@@ -20,8 +25,10 @@ import dji.common.mission.hotpoint.HotpointMission
 import dji.sdk.mission.MissionControl
 import dji.sdk.mission.timeline.TimelineElement
 import dji.sdk.mission.timeline.TimelineEvent
-import dji.sdk.mission.timeline.actions.GoHomeAction
-import dji.sdk.mission.timeline.actions.HotpointAction
+import dji.sdk.sdkmanager.DJISDKManager
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import pdb.app.base.extensions.dp
 import pdb.app.base.extensions.dpInt
 import pdb.app.base.extensions.getColorCompat
@@ -46,6 +53,11 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
 
     private var currentGroupPolygon: Polygon? = null
     private var currentText: Text? = null
+
+    private var currentJob: Job? = null
+    private var nextMissionJob: Job? = null
+    private var currentTask: GroundHotPointMissionConfigEvent? = null
+    private var currentEvent: HotPointMissionConfigEvent? = null
 
     private val markers = ArrayList<Marker>()
     private val circles = ArrayList<Circle>()
@@ -184,23 +196,53 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
             radius,
             activity?.getString(R.string.fun_ground_mission_config_title),
             configReceiver = { mission ->
-                val missionControl = MissionControl.getInstance()
-                missionControl.scheduleElements(circles.map {
-                    val hotPointMission = HotpointMission()
-                    hotPointMission.resetMissionWithData(mission)
-                    hotPointMission.hotpoint = it.center.toDJILocation()
-                    HotpointAction(hotPointMission, 360f)
-                }.toMutableList<TimelineElement>().apply {
-                    add(GoHomeAction())
-                }.toList())
-                missionControl.addListener(this)
-                missionControl.startTimeline()
-                setupTaskUI()
+//                val missionControl = MissionControl.getInstance()
+//                missionControl.scheduleElements(circles.map {
+//                    val hotPointMission = HotpointMission()
+//                    hotPointMission.resetMissionWithData(mission)
+//                    hotPointMission.hotpoint = it.center.toDJILocation()
+//                    HotpointAction(hotPointMission, 360f)
+//                }.toMutableList<TimelineElement>().apply {
+//                    add(GoHomeAction())
+//                }.toList())
+//                missionControl.addListener(this)
+//                missionControl.startTimeline()
+//                setupTaskUI()
+                startMissions(mission)
             })
         requireNotNull(activity).supportFragmentManager.beginTransaction()
             .add(R.id.fragment_container, configFragment)
             .show(configFragment)
             .commit()
+    }
+
+    private fun startMissions(event: HotPointMissionConfigEvent) {
+        currentJob?.cancel()
+        currentJob = activity?.lifecycleScope?.launch {
+            val missions = circles.map {
+                val hotPointMission = HotpointMission()
+                hotPointMission.resetMissionWithData(event.mission)
+                hotPointMission.hotpoint = it.center.toDJILocation()
+                HotPointMissionConfigEvent(
+                    hotPointMission, event.takePhotoCount,
+                    event.takePhotoByApi,
+                    event.takeOffFirst
+                )
+            }
+
+            App.getEventBus().post(
+                GroundHotPointMissionConfigEvent(
+                    missions,
+                    event.takePhotoCount,
+                    event.takePhotoByApi,
+                    event.takeOffFirst
+                ).also {
+                    currentTask = it
+                }
+            )
+
+            setupTaskUI()
+        }
     }
 
     private fun clear() {
@@ -221,15 +263,17 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
                 gravity = Gravity.CENTER_VERTICAL
                 addView(TextView(activity).apply {
                     minHeight = 40.dpInt(context)
-                    gravity= Gravity.CENTER_VERTICAL
-                    text = context.getString(R.string.fun_groundMission_point_count_hint, circles.size)
+                    gravity = Gravity.CENTER_VERTICAL
+                    text =
+                        context.getString(R.string.fun_groundMission_point_count_hint, circles.size)
                 })
             })
             setupCancel()
             onCloseClick = {
+                currentTask = null
                 this.removeFromParent()
                 clear()
-                MissionControl.getInstance().stopTimeline()
+                App.getEventBus().post(StopHotPointEvent())
             }
             onOkClick = {
 
@@ -280,6 +324,40 @@ class GroundMissionHelper : IPickPointMarker, MissionControl.Listener {
     override fun onEvent(p0: TimelineElement?, p1: TimelineEvent?, p2: DJIError?) {
         p2?.let {
             activity?.showSnack("环绕飞行任务异常：${it.description}(${it.errorCode})")
+        }
+    }
+
+
+    fun nextMissionEvent(
+        event: HotPointMissionConfigEvent,
+        checkCurrentJob: Boolean = false
+    ): HotPointMissionConfigEvent? {
+        if (event == currentEvent) {
+            currentEvent = null
+            nextMissionJob?.cancel()
+        }
+        return currentTask?.missions?.indexOfFirst { it.id == event.id }?.takeIf { it >= 0 }?.run {
+            currentTask?.missions?.getOrNull(this + 1)
+        }
+    }
+
+    fun isGroundMissionEvent(event: HotPointMissionConfigEvent): Boolean {
+        return currentTask?.missions?.find { it.id == event.id } != null
+    }
+
+    fun createNextMissionTimer(event: HotPointMissionConfigEvent) {
+        if (isGroundMissionEvent(event)) {
+            currentEvent = event
+            nextMissionJob?.cancel()
+            nextMissionJob = activity?.lifecycleScope?.launch {
+                delay(((event.mission.flyTimeSec + 5) * 1000L).toLong())
+                nextMissionEvent(event)?.let {
+                    activity?.showSnack("createNextMissionTimer ${it.id}")
+                    App.getEventBus().post(it.copy(takeOffFirst = false))
+                } ?: kotlin.run {
+                    currentTask = null
+                }
+            }
         }
     }
 }
